@@ -16,8 +16,8 @@ export interface OperationMeta {
   path: string;
   summary?: string;
   deprecated?: boolean;
-  pathParams: ParamMeta[];
-  query: ParamMeta[];
+  pathParams: readonly ParamMeta[];
+  query: readonly ParamMeta[];
   /** JSON request body schema (refs rewritten to `#/$defs/<Name>`), if the operation takes one. */
   body?: { required: boolean; schema: Record<string, unknown> };
   /** The operation accepts an Idempotency-Key header. */

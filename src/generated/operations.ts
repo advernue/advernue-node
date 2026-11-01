@@ -6445,7 +6445,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -6507,7 +6507,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7077,7 +7077,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7126,7 +7126,7 @@ export const operations: Record<string, OperationMeta> = {
     }
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7191,7 +7191,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7258,7 +7258,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7317,7 +7317,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7396,7 +7396,7 @@ export const operations: Record<string, OperationMeta> = {
     ]
    }
   },
-  "idempotent": true,
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
@@ -7405,6 +7405,32 @@ export const operations: Record<string, OperationMeta> = {
 
 /** Component schemas as JSON Schema; operation schemas reference these as `#/$defs/<Name>`. */
 export const componentSchemas: Record<string, Record<string, unknown>> = {
+ "Error": {
+  "type": "object",
+  "properties": {
+   "error": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "type": "string"
+     },
+     "message": {
+      "type": "string"
+     },
+     "details": {}
+    },
+    "required": [
+     "code",
+     "message"
+    ],
+    "additionalProperties": false
+   }
+  },
+  "required": [
+   "error"
+  ],
+  "additionalProperties": false
+ },
  "Money": {
   "type": "object",
   "properties": {

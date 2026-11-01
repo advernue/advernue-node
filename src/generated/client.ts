@@ -775,28 +775,28 @@ export function buildNamespaces(call: Call) {
       digest: (params?: AnalyticsDigestParams, opts?: RequestOptions): Promise<AnalyticsDigestResponse> =>
         call(op("analytics.digest"), params, undefined, opts) as Promise<AnalyticsDigestResponse>,
       /** POST /v1/analytics/compare: Compare metrics grouped by platform, account, campaign, cross-campaign or date */
-      compare: (body: AnalyticsCompareBody, opts?: WriteOptions): Promise<AnalyticsCompareResponse> =>
+      compare: (body: AnalyticsCompareBody, opts?: RequestOptions): Promise<AnalyticsCompareResponse> =>
         call(op("analytics.compare"), undefined, body, opts) as Promise<AnalyticsCompareResponse>,
       /** POST /v1/analytics/timeseries: Daily metrics for entities over a date range, in the reporting currency */
-      timeseries: (body: AnalyticsTimeseriesBody, opts?: WriteOptions): Promise<AnalyticsTimeseriesResponse> =>
+      timeseries: (body: AnalyticsTimeseriesBody, opts?: RequestOptions): Promise<AnalyticsTimeseriesResponse> =>
         call(op("analytics.timeseries"), undefined, body, opts) as Promise<AnalyticsTimeseriesResponse>,
       /** POST /v1/analytics/breakdown: Metrics split by a dimension (country, device, placement, age, gender, hour), across platforms */
-      breakdown: (body: AnalyticsBreakdownBody, opts?: WriteOptions): Promise<AnalyticsBreakdownResponse> =>
+      breakdown: (body: AnalyticsBreakdownBody, opts?: RequestOptions): Promise<AnalyticsBreakdownResponse> =>
         call(op("analytics.breakdown"), undefined, body, opts) as Promise<AnalyticsBreakdownResponse>,
       /** POST /v1/analytics/pacing: Budget pacing: spend vs expected to date, projected end, on_track/under/over (5% default) */
-      pacing: (body: AnalyticsPacingBody, opts?: WriteOptions): Promise<AnalyticsPacingResponse> =>
+      pacing: (body: AnalyticsPacingBody, opts?: RequestOptions): Promise<AnalyticsPacingResponse> =>
         call(op("analytics.pacing"), undefined, body, opts) as Promise<AnalyticsPacingResponse>,
       /** POST /v1/analytics/forecast: Forecast spend, conversions and value for N days (seasonal naive or Holt); needs 14+ days */
-      forecast: (body: AnalyticsForecastBody, opts?: WriteOptions): Promise<AnalyticsForecastResponse> =>
+      forecast: (body: AnalyticsForecastBody, opts?: RequestOptions): Promise<AnalyticsForecastResponse> =>
         call(op("analytics.forecast"), undefined, body, opts) as Promise<AnalyticsForecastResponse>,
       /** POST /v1/analytics/synergy: Blended MER, platform overlap and assists, lagged spend correlation (not causal) */
-      synergy: (body: AnalyticsSynergyBody, opts?: WriteOptions): Promise<AnalyticsSynergyResponse> =>
+      synergy: (body: AnalyticsSynergyBody, opts?: RequestOptions): Promise<AnalyticsSynergyResponse> =>
         call(op("analytics.synergy"), undefined, body, opts) as Promise<AnalyticsSynergyResponse>,
       /** POST /v1/analytics/saturation: Diminishing-returns fit per platform or campaign with marginal ROAS and a confidence flag */
-      saturation: (body: AnalyticsSaturationBody, opts?: WriteOptions): Promise<AnalyticsSaturationResponse> =>
+      saturation: (body: AnalyticsSaturationBody, opts?: RequestOptions): Promise<AnalyticsSaturationResponse> =>
         call(op("analytics.saturation"), undefined, body, opts) as Promise<AnalyticsSaturationResponse>,
       /** POST /v1/analytics/reallocation: Advisory budget reallocation equalizing marginal ROAS at the same total; never writes */
-      reallocation: (body: AnalyticsReallocationBody, opts?: WriteOptions): Promise<AnalyticsReallocationResponse> =>
+      reallocation: (body: AnalyticsReallocationBody, opts?: RequestOptions): Promise<AnalyticsReallocationResponse> =>
         call(op("analytics.reallocation"), undefined, body, opts) as Promise<AnalyticsReallocationResponse>,
     },
     appCredentials: {
