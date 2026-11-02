@@ -368,8 +368,13 @@ export type ConversionDelivery = {
 export type CampaignBrief = {
   name: string;
   objective: "awareness" | "traffic" | "engagement" | "leads" | "app_installs" | "sales" | "video_views";
-  totalBudget: Budget;
-  /** how totalBudget is divided across targets */
+  totalBudget: {
+    type: "daily" | "lifetime";
+    amount: {
+      micros: number;
+      currency: string;
+    };
+  };
   split: {
     type: "equal";
   } | {
@@ -377,16 +382,11 @@ export type CampaignBrief = {
     weights: Record<string, number>;
   } | {
     type: "performance";
-    /** default 30 */
     lookbackDays?: number;
-    /** default 10 */
     minConversions?: number;
-    /** default 0 */
     minSpendMicros?: number;
   };
-  /** ISO-8601 with Z or an offset; normalised to UTC */
   startAt?: string;
-  /** must be >= startAt */
   endAt?: string;
   targeting: {
     countries: Array<string>;
@@ -419,16 +419,20 @@ export type CampaignBrief = {
     }>;
     platformNative: Record<string, unknown>;
   }>;
-  /** tagged with utm and adv_cid on launch */
   destinationUrl: string;
-  /** ad account ids of one client, no duplicates */
   targets: Array<string>;
   acceptUnknownSpec?: boolean;
-  /** platformNative-style extras per platform */
   platformOverrides?: Record<string, {
     campaign?: Record<string, unknown>;
     adGroup?: Record<string, unknown>;
-    bid?: Bid;
+    bid?: {
+      strategy: "lowest_cost" | "cost_cap" | "bid_cap" | "target_roas" | "target_cpa" | "manual_cpc";
+      amount?: {
+        micros: number;
+        currency: string;
+      };
+      targetRoas?: number;
+    };
   }>;
 };
 
@@ -492,7 +496,6 @@ export type ReportTemplatesCreateBody = {
   sections: Array<{
     type: "kpis" | "platform_comparison" | "time_series" | "top_campaigns" | "roas_comparison" | "notes";
     title?: string;
-    /** Row cap for ranked tables. */
     limit?: number;
   }>;
 };
@@ -514,7 +517,6 @@ export type ReportTemplatesUpdateBody = {
   sections?: Array<{
     type: "kpis" | "platform_comparison" | "time_series" | "top_campaigns" | "roas_comparison" | "notes";
     title?: string;
-    /** Row cap for ranked tables. */
     limit?: number;
   }>;
 };
@@ -556,12 +558,12 @@ export type ReportSchedulesListResponse = Array<{
 }>;
 
 export type ReportSchedulesCreateBody = {
-  clientId: string;
-  templateId: string;
   frequency: "weekly" | "monthly";
   weekday?: number;
   dayOfMonth?: number;
   hour?: number;
+  clientId: string;
+  templateId: string;
   recipients?: Array<string>;
   enabled?: boolean;
 };
@@ -646,7 +648,6 @@ export type ReportsListResponse = Array<{
 
 export type ReportsGenerateBody = {
   clientId: string;
-  /** Default: all sections. */
   templateId?: string;
   from: string;
   to: string;
@@ -1023,11 +1024,9 @@ export type BrandingGetResponse = {
 
 export type BrandingSetBody = {
   name: string;
-  /** data:image/(png|jpeg|webp|gif);base64 URI, ~250 KB max. */
   logoUrl: string | null;
   primaryColor: string;
   accentColor: string;
-  /** Hostname; informational (DNS is not managed). */
   customDomain: string | null;
   fromName: string | null;
 };
@@ -1227,7 +1226,6 @@ export type InvitesCreateBody = {
   email: string;
   role: "owner" | "admin" | "manager" | "viewer";
   clientId?: string;
-  /** manager and viewer only. */
   permissions?: Array<"approve" | "notes">;
 };
 export type InvitesCreateResponse = {
@@ -1316,7 +1314,6 @@ export type RulesListResponse = Array<{
 export type RulesCreateBody = {
   kind: "guardrail" | "automation";
   name: string;
-  /** Must match the guardrail or automation schema for `kind`. */
   definition: unknown;
   clientId?: string;
   enabled?: boolean;
@@ -1548,7 +1545,6 @@ export type NotificationsCreateChannelBody = {
   kind: "slack" | "email" | "webhook";
   name: string;
   config?: Record<string, unknown>;
-  /** Write-only: urls, passwords, signing secrets. Never returned; see hasSecret. */
   secret: Record<string, unknown>;
 };
 export type NotificationsCreateChannelResponse = {
@@ -1572,9 +1568,7 @@ export type NotificationsUpdateChannelParams = {
 export type NotificationsUpdateChannelBody = {
   name?: string;
   enabled?: boolean;
-  /** Changing config requires `secret` again. */
   config?: Record<string, unknown>;
-  /** Write-only: urls, passwords, signing secrets. Never returned; see hasSecret. */
   secret?: Record<string, unknown>;
 };
 export type NotificationsUpdateChannelResponse = {
@@ -2145,9 +2139,8 @@ export type CreativesUploadResponse = Action;
 export type ConnectionsListResponse = Array<Connection>;
 
 export type ConnectionsCreateBody = {
-  platform: Platform;
+  platform: "google_ads" | "meta" | "tiktok" | "microsoft" | "linkedin" | "reddit" | "pinterest" | "snapchat" | "x" | "amazon" | "apple" | "taboola" | "outbrain" | "criteo" | "propellerads" | "adsterra" | "exoclick" | "trafficfactory" | "mgid" | "trafficstars" | "clickadu" | "revcontent" | "content_ad" | "thetradedesk" | "dv360" | "amazon_dsp" | "walmart" | "applovin" | "unity_ads" | "spotify" | "roku" | "roundel" | "instacart" | "kroger" | "ebay" | "alibaba" | "jd" | "mercado_ads" | "quora" | "nextdoor" | "yahoo_dsp" | "stackadapt" | "adform" | "basis" | "adskeeper" | "equativ" | "inmobi" | "trafficjunky" | "plugrush" | "clickadilla" | "juicyads" | "eroadvertising" | "impact" | "cj" | "awin" | "partnerstack" | "rakuten_advertising" | "tradedoubler" | "zeta" | "admitad" | "openai_ads" | "mintegral" | "moloco" | "huawei_petal_ads" | "liftoff" | "adswizz" | "kayzen" | "jampp" | "podscribe" | "rollworks" | "buysellads" | "ethicalads" | "avito" | "indeed" | "craigslist" | "olx" | "seek" | "adshares" | "bitmedia" | "coinzilla" | "hivestack" | "vistar" | "adquick" | "beeswax" | "simplifi" | "adroll" | "quantcast" | "epom" | "eskimi" | "bidtheatre" | "zemanta" | "viant" | "nexxen" | "mediamath" | "adobe_dsp" | "rtb_house" | "teads" | "choozle" | "roblox_ads" | "yelp" | "smartnews" | "kakao_moment" | "naver_gfa" | "nativo" | "paved" | "letterhead" | "sparkloop" | "opera_ads" | "remerge" | "zeropark" | "kadam" | "hilltopads" | "mybid" | "passionfroot" | "liveintent" | "admaven" | "adcash" | "popcash" | "mondiad" | "galaksion" | "evadav" | "popads" | "richads" | "qianchuan" | "uber_ads" | "doordash" | "bol" | "ozon" | "wildberries" | "citrusad" | "koddi" | "topsort" | "albertsons" | "shopee" | "sams_club" | "otto" | "allegro" | "temu" | "moloco_commerce" | "yandex_direct" | "baidu" | "naver_searchad" | "seznam_sklik" | "yahoo_japan_ads" | "kakao_keyword_ad" | "so_360" | "brave_ads" | "vk_ads" | "tencent_ads" | "oceanengine" | "weibo" | "dcard" | "zalo" | "digital_turbine" | "start_io" | "xiaomi_ads" | "chartboost" | "magalu" | "bidease" | "lazada" | "smadex" | "newsbreak" | "sogou" | "getintent" | "ziprecruiter" | "mobon" | "joveo" | "aarki" | "campaign_manager_360" | "tapfiliate" | "refersion" | "kelkoo" | "everflow" | "rokt" | "shopify_shop_campaigns" | "adikteev" | "tradetracker" | "partnerize" | "clickbank" | "triplelift" | "adtraction" | "kargo" | "skai" | "demandbase" | "appier" | "takealot" | "smartyads" | "flipkart" | "kuaishou" | "kwai" | "line_ads" | "xiaohongshu" | "vibe_co" | "universal_ads" | "tvscientific" | "madhive" | "rumble" | "samsung_ads" | "mntn" | "meituan" | "telegram_ads" | "mock" | "shenma" | "coccoc" | "perplexity" | "tumblr" | "discord" | "bluesky" | "graze_social" | "kick" | "bilibili" | "zhihu" | "sharechat" | "dailyhunt" | "hatena" | "pixiv" | "niconico" | "ameba" | "mastodon" | "substack" | "medium" | "stack_overflow" | "product_hunt" | "hacker_news" | "github" | "imgur" | "ninegag" | "tinder" | "bumble" | "grindr" | "strava" | "xing" | "gab" | "minds" | "bereal" | "viber" | "truecaller" | "signal" | "disney" | "tatari" | "spectrum_reach" | "ampersand" | "iqiyi" | "jiohotstar" | "zee5" | "viu" | "tver" | "soop" | "audacy" | "libsyn" | "audioboom" | "redcircle" | "gumball" | "anghami" | "etsy" | "cvs" | "ulta" | "wayfair" | "chewy" | "sephora" | "grab" | "goto" | "myntra" | "meesho" | "nykaa" | "blinkit" | "zepto" | "swiggy" | "rakuten_rpp" | "mercari" | "coupang" | "zalando" | "cdiscount" | "tesco_media" | "noon" | "trendyol" | "rappi" | "ifood" | "paypal_ads" | "chase_media" | "samsung_galaxy_store" | "oppo_ads" | "vivo_ads" | "transsion_ads" | "aptoide" | "bigo_ads" | "verve" | "yeahmobi" | "adjoe" | "mistplay" | "anzu" | "frameplay" | "admix" | "steam" | "playstation" | "nintendo" | "epic_games" | "overwolf" | "venatus" | "microsoft_invest" | "illumin" | "cadent" | "sixsense" | "madison_logic" | "hawk" | "perion" | "admixer" | "dable" | "popin" | "logly" | "gunosy" | "plista" | "zergnet" | "lockerdome" | "engageya" | "flipboard" | "rollerads" | "pushground" | "megapush" | "bidvertiser" | "seven_search" | "infolinks" | "twinred" | "adxpansion" | "cointraffic" | "a_ads" | "hypelab" | "slise" | "coinmarketcap_ads" | "coingecko_ads" | "collabstr" | "beehiiv_ads" | "sponsy" | "kit_sponsor_network" | "g2" | "trustradius" | "codefund" | "daily_dev" | "dev_to" | "techtarget" | "clutch" | "angi" | "thumbtack" | "houzz" | "two_gis" | "kayak" | "expedia_group" | "trivago" | "skyscanner" | "hopper" | "trip_com" | "airbnb" | "gumtree" | "kijiji" | "leboncoin" | "stepstone" | "appcast" | "zillow" | "billups" | "hinge" | "mixi" | "taringa" | "plurk" | "mewe" | "wattpad" | "duolingo" | "trovo" | "letterboxd" | "chingari" | "ptt" | "flickr" | "fanfiction" | "koo" | "clubhouse" | "caffeine" | "hike" | "patreon" | "vimeo" | "triller" | "pacvue" | "quartile" | "magnite" | "pubmatic" | "openx" | "index_exchange" | "sharethrough" | "sovrn" | "gumgum" | "yieldmo" | "pulsepoint" | "webgains" | "involve_asia" | "skimlinks" | "triton_digital" | "cardlytics" | "ibotta_ipn" | "mirakl_ads" | "podcorn" | "seedtag" | "karrot_daangn" | "toss_ads" | "mts_ads" | "pinduoduo" | "carousell" | "paytm_ads" | "phonepe_ads" | "zomato_ads" | "ogury" | "cognitiv" | "system1" | "boomplay" | "sber_ads" | "qoo10" | "emag_ads" | "kaspi_ads" | "nectar360" | "vinted_ads" | "foursquare_ads" | "jooble" | "talent_com" | "zoominfo_ads" | "terminus" | "ltk" | "valuecommerce" | "idealo" | "pricerunner" | "skroutz" | "heureka" | "zbozi_cz" | "ceneo" | "kevel" | "sojern" | "thrad" | "zeroclick" | "koah" | "cartology" | "coles_360" | "kohls_media_network" | "ad_retail_media" | "hepsiburada_ads" | "daisycon" | "digistore24" | "innovid" | "mediaocean_prisma" | "appnext" | "sigmob" | "topon_tradplus" | "persona_ly" | "glance" | "mediavine" | "raptive" | "ezoic" | "adpushup" | "freestar" | "playwire" | "connatix" | "jcdecaux" | "clear_channel_outdoor" | "outfront_media" | "lamar_advertising" | "moving_walls" | "adomni" | "bombora" | "metadata_io" | "influ2" | "aspire" | "creatoriq" | "upfluence" | "spreaker" | "kinective_media" | "shahid_mms_works" | "nordstrom_media_network" | "dicks_media_network" | "zitcha" | "promoted_ai" | "makemytrip_ads" | "yemeksepeti_ads" | "glance_ads" | "jioads" | "cauly" | "adpopcorn" | "i_mobile" | "microad" | "logicad" | "freakout_red" | "ximalaya_ads" | "netease_cloud_music_ads" | "gaana_ads" | "radiko_ads" | "philo_ads" | "xumo_ads" | "rakuten_viki" | "delivery_hero" | "jumia" | "tripadvisor";
   label: string;
-  /** write-only; fields depend on the platform (see platforms catalog credentialFields) */
   credentials: Record<string, unknown>;
 };
 export type ConnectionsCreateResponse = Connection;
@@ -2171,9 +2164,8 @@ export type ConnectionsOauthCallbackResponse = Connection;
 export type ConnectionsHealthResponse = Array<ConnectionHealth>;
 
 export type ConnectionsCreateWithCredentialsBody = {
-  platform: Platform;
+  platform: "google_ads" | "meta" | "tiktok" | "microsoft" | "linkedin" | "reddit" | "pinterest" | "snapchat" | "x" | "amazon" | "apple" | "taboola" | "outbrain" | "criteo" | "propellerads" | "adsterra" | "exoclick" | "trafficfactory" | "mgid" | "trafficstars" | "clickadu" | "revcontent" | "content_ad" | "thetradedesk" | "dv360" | "amazon_dsp" | "walmart" | "applovin" | "unity_ads" | "spotify" | "roku" | "roundel" | "instacart" | "kroger" | "ebay" | "alibaba" | "jd" | "mercado_ads" | "quora" | "nextdoor" | "yahoo_dsp" | "stackadapt" | "adform" | "basis" | "adskeeper" | "equativ" | "inmobi" | "trafficjunky" | "plugrush" | "clickadilla" | "juicyads" | "eroadvertising" | "impact" | "cj" | "awin" | "partnerstack" | "rakuten_advertising" | "tradedoubler" | "zeta" | "admitad" | "openai_ads" | "mintegral" | "moloco" | "huawei_petal_ads" | "liftoff" | "adswizz" | "kayzen" | "jampp" | "podscribe" | "rollworks" | "buysellads" | "ethicalads" | "avito" | "indeed" | "craigslist" | "olx" | "seek" | "adshares" | "bitmedia" | "coinzilla" | "hivestack" | "vistar" | "adquick" | "beeswax" | "simplifi" | "adroll" | "quantcast" | "epom" | "eskimi" | "bidtheatre" | "zemanta" | "viant" | "nexxen" | "mediamath" | "adobe_dsp" | "rtb_house" | "teads" | "choozle" | "roblox_ads" | "yelp" | "smartnews" | "kakao_moment" | "naver_gfa" | "nativo" | "paved" | "letterhead" | "sparkloop" | "opera_ads" | "remerge" | "zeropark" | "kadam" | "hilltopads" | "mybid" | "passionfroot" | "liveintent" | "admaven" | "adcash" | "popcash" | "mondiad" | "galaksion" | "evadav" | "popads" | "richads" | "qianchuan" | "uber_ads" | "doordash" | "bol" | "ozon" | "wildberries" | "citrusad" | "koddi" | "topsort" | "albertsons" | "shopee" | "sams_club" | "otto" | "allegro" | "temu" | "moloco_commerce" | "yandex_direct" | "baidu" | "naver_searchad" | "seznam_sklik" | "yahoo_japan_ads" | "kakao_keyword_ad" | "so_360" | "brave_ads" | "vk_ads" | "tencent_ads" | "oceanengine" | "weibo" | "dcard" | "zalo" | "digital_turbine" | "start_io" | "xiaomi_ads" | "chartboost" | "magalu" | "bidease" | "lazada" | "smadex" | "newsbreak" | "sogou" | "getintent" | "ziprecruiter" | "mobon" | "joveo" | "aarki" | "campaign_manager_360" | "tapfiliate" | "refersion" | "kelkoo" | "everflow" | "rokt" | "shopify_shop_campaigns" | "adikteev" | "tradetracker" | "partnerize" | "clickbank" | "triplelift" | "adtraction" | "kargo" | "skai" | "demandbase" | "appier" | "takealot" | "smartyads" | "flipkart" | "kuaishou" | "kwai" | "line_ads" | "xiaohongshu" | "vibe_co" | "universal_ads" | "tvscientific" | "madhive" | "rumble" | "samsung_ads" | "mntn" | "meituan" | "telegram_ads" | "mock" | "shenma" | "coccoc" | "perplexity" | "tumblr" | "discord" | "bluesky" | "graze_social" | "kick" | "bilibili" | "zhihu" | "sharechat" | "dailyhunt" | "hatena" | "pixiv" | "niconico" | "ameba" | "mastodon" | "substack" | "medium" | "stack_overflow" | "product_hunt" | "hacker_news" | "github" | "imgur" | "ninegag" | "tinder" | "bumble" | "grindr" | "strava" | "xing" | "gab" | "minds" | "bereal" | "viber" | "truecaller" | "signal" | "disney" | "tatari" | "spectrum_reach" | "ampersand" | "iqiyi" | "jiohotstar" | "zee5" | "viu" | "tver" | "soop" | "audacy" | "libsyn" | "audioboom" | "redcircle" | "gumball" | "anghami" | "etsy" | "cvs" | "ulta" | "wayfair" | "chewy" | "sephora" | "grab" | "goto" | "myntra" | "meesho" | "nykaa" | "blinkit" | "zepto" | "swiggy" | "rakuten_rpp" | "mercari" | "coupang" | "zalando" | "cdiscount" | "tesco_media" | "noon" | "trendyol" | "rappi" | "ifood" | "paypal_ads" | "chase_media" | "samsung_galaxy_store" | "oppo_ads" | "vivo_ads" | "transsion_ads" | "aptoide" | "bigo_ads" | "verve" | "yeahmobi" | "adjoe" | "mistplay" | "anzu" | "frameplay" | "admix" | "steam" | "playstation" | "nintendo" | "epic_games" | "overwolf" | "venatus" | "microsoft_invest" | "illumin" | "cadent" | "sixsense" | "madison_logic" | "hawk" | "perion" | "admixer" | "dable" | "popin" | "logly" | "gunosy" | "plista" | "zergnet" | "lockerdome" | "engageya" | "flipboard" | "rollerads" | "pushground" | "megapush" | "bidvertiser" | "seven_search" | "infolinks" | "twinred" | "adxpansion" | "cointraffic" | "a_ads" | "hypelab" | "slise" | "coinmarketcap_ads" | "coingecko_ads" | "collabstr" | "beehiiv_ads" | "sponsy" | "kit_sponsor_network" | "g2" | "trustradius" | "codefund" | "daily_dev" | "dev_to" | "techtarget" | "clutch" | "angi" | "thumbtack" | "houzz" | "two_gis" | "kayak" | "expedia_group" | "trivago" | "skyscanner" | "hopper" | "trip_com" | "airbnb" | "gumtree" | "kijiji" | "leboncoin" | "stepstone" | "appcast" | "zillow" | "billups" | "hinge" | "mixi" | "taringa" | "plurk" | "mewe" | "wattpad" | "duolingo" | "trovo" | "letterboxd" | "chingari" | "ptt" | "flickr" | "fanfiction" | "koo" | "clubhouse" | "caffeine" | "hike" | "patreon" | "vimeo" | "triller" | "pacvue" | "quartile" | "magnite" | "pubmatic" | "openx" | "index_exchange" | "sharethrough" | "sovrn" | "gumgum" | "yieldmo" | "pulsepoint" | "webgains" | "involve_asia" | "skimlinks" | "triton_digital" | "cardlytics" | "ibotta_ipn" | "mirakl_ads" | "podcorn" | "seedtag" | "karrot_daangn" | "toss_ads" | "mts_ads" | "pinduoduo" | "carousell" | "paytm_ads" | "phonepe_ads" | "zomato_ads" | "ogury" | "cognitiv" | "system1" | "boomplay" | "sber_ads" | "qoo10" | "emag_ads" | "kaspi_ads" | "nectar360" | "vinted_ads" | "foursquare_ads" | "jooble" | "talent_com" | "zoominfo_ads" | "terminus" | "ltk" | "valuecommerce" | "idealo" | "pricerunner" | "skroutz" | "heureka" | "zbozi_cz" | "ceneo" | "kevel" | "sojern" | "thrad" | "zeroclick" | "koah" | "cartology" | "coles_360" | "kohls_media_network" | "ad_retail_media" | "hepsiburada_ads" | "daisycon" | "digistore24" | "innovid" | "mediaocean_prisma" | "appnext" | "sigmob" | "topon_tradplus" | "persona_ly" | "glance" | "mediavine" | "raptive" | "ezoic" | "adpushup" | "freestar" | "playwire" | "connatix" | "jcdecaux" | "clear_channel_outdoor" | "outfront_media" | "lamar_advertising" | "moving_walls" | "adomni" | "bombora" | "metadata_io" | "influ2" | "aspire" | "creatoriq" | "upfluence" | "spreaker" | "kinective_media" | "shahid_mms_works" | "nordstrom_media_network" | "dicks_media_network" | "zitcha" | "promoted_ai" | "makemytrip_ads" | "yemeksepeti_ads" | "glance_ads" | "jioads" | "cauly" | "adpopcorn" | "i_mobile" | "microad" | "logicad" | "freakout_red" | "ximalaya_ads" | "netease_cloud_music_ads" | "gaana_ads" | "radiko_ads" | "philo_ads" | "xumo_ads" | "rakuten_viki" | "delivery_hero" | "jumia" | "tripadvisor";
   label: string;
-  /** write-only; fields depend on the platform (see platforms catalog credentialFields) */
   credentials: Record<string, unknown>;
 };
 export type ConnectionsCreateWithCredentialsResponse = Connection;
@@ -2257,30 +2249,24 @@ export type AdAccountsSyncResponse = {
 export type RulesSimulateBody = {
   /** give ruleId or definition */
   ruleId?: string;
-  /** automation rule definition */
   definition?: {
     scope: {
       clientId?: string;
-      platform?: Platform;
+      platform?: "google_ads" | "meta" | "tiktok" | "microsoft" | "linkedin" | "reddit" | "pinterest" | "snapchat" | "x" | "amazon" | "apple" | "taboola" | "outbrain" | "criteo" | "propellerads" | "adsterra" | "exoclick" | "trafficfactory" | "mgid" | "trafficstars" | "clickadu" | "revcontent" | "content_ad" | "thetradedesk" | "dv360" | "amazon_dsp" | "walmart" | "applovin" | "unity_ads" | "spotify" | "roku" | "roundel" | "instacart" | "kroger" | "ebay" | "alibaba" | "jd" | "mercado_ads" | "quora" | "nextdoor" | "yahoo_dsp" | "stackadapt" | "adform" | "basis" | "adskeeper" | "equativ" | "inmobi" | "trafficjunky" | "plugrush" | "clickadilla" | "juicyads" | "eroadvertising" | "impact" | "cj" | "awin" | "partnerstack" | "rakuten_advertising" | "tradedoubler" | "zeta" | "admitad" | "openai_ads" | "mintegral" | "moloco" | "huawei_petal_ads" | "liftoff" | "adswizz" | "kayzen" | "jampp" | "podscribe" | "rollworks" | "buysellads" | "ethicalads" | "avito" | "indeed" | "craigslist" | "olx" | "seek" | "adshares" | "bitmedia" | "coinzilla" | "hivestack" | "vistar" | "adquick" | "beeswax" | "simplifi" | "adroll" | "quantcast" | "epom" | "eskimi" | "bidtheatre" | "zemanta" | "viant" | "nexxen" | "mediamath" | "adobe_dsp" | "rtb_house" | "teads" | "choozle" | "roblox_ads" | "yelp" | "smartnews" | "kakao_moment" | "naver_gfa" | "nativo" | "paved" | "letterhead" | "sparkloop" | "opera_ads" | "remerge" | "zeropark" | "kadam" | "hilltopads" | "mybid" | "passionfroot" | "liveintent" | "admaven" | "adcash" | "popcash" | "mondiad" | "galaksion" | "evadav" | "popads" | "richads" | "qianchuan" | "uber_ads" | "doordash" | "bol" | "ozon" | "wildberries" | "citrusad" | "koddi" | "topsort" | "albertsons" | "shopee" | "sams_club" | "otto" | "allegro" | "temu" | "moloco_commerce" | "yandex_direct" | "baidu" | "naver_searchad" | "seznam_sklik" | "yahoo_japan_ads" | "kakao_keyword_ad" | "so_360" | "brave_ads" | "vk_ads" | "tencent_ads" | "oceanengine" | "weibo" | "dcard" | "zalo" | "digital_turbine" | "start_io" | "xiaomi_ads" | "chartboost" | "magalu" | "bidease" | "lazada" | "smadex" | "newsbreak" | "sogou" | "getintent" | "ziprecruiter" | "mobon" | "joveo" | "aarki" | "campaign_manager_360" | "tapfiliate" | "refersion" | "kelkoo" | "everflow" | "rokt" | "shopify_shop_campaigns" | "adikteev" | "tradetracker" | "partnerize" | "clickbank" | "triplelift" | "adtraction" | "kargo" | "skai" | "demandbase" | "appier" | "takealot" | "smartyads" | "flipkart" | "kuaishou" | "kwai" | "line_ads" | "xiaohongshu" | "vibe_co" | "universal_ads" | "tvscientific" | "madhive" | "rumble" | "samsung_ads" | "mntn" | "meituan" | "telegram_ads" | "mock" | "shenma" | "coccoc" | "perplexity" | "tumblr" | "discord" | "bluesky" | "graze_social" | "kick" | "bilibili" | "zhihu" | "sharechat" | "dailyhunt" | "hatena" | "pixiv" | "niconico" | "ameba" | "mastodon" | "substack" | "medium" | "stack_overflow" | "product_hunt" | "hacker_news" | "github" | "imgur" | "ninegag" | "tinder" | "bumble" | "grindr" | "strava" | "xing" | "gab" | "minds" | "bereal" | "viber" | "truecaller" | "signal" | "disney" | "tatari" | "spectrum_reach" | "ampersand" | "iqiyi" | "jiohotstar" | "zee5" | "viu" | "tver" | "soop" | "audacy" | "libsyn" | "audioboom" | "redcircle" | "gumball" | "anghami" | "etsy" | "cvs" | "ulta" | "wayfair" | "chewy" | "sephora" | "grab" | "goto" | "myntra" | "meesho" | "nykaa" | "blinkit" | "zepto" | "swiggy" | "rakuten_rpp" | "mercari" | "coupang" | "zalando" | "cdiscount" | "tesco_media" | "noon" | "trendyol" | "rappi" | "ifood" | "paypal_ads" | "chase_media" | "samsung_galaxy_store" | "oppo_ads" | "vivo_ads" | "transsion_ads" | "aptoide" | "bigo_ads" | "verve" | "yeahmobi" | "adjoe" | "mistplay" | "anzu" | "frameplay" | "admix" | "steam" | "playstation" | "nintendo" | "epic_games" | "overwolf" | "venatus" | "microsoft_invest" | "illumin" | "cadent" | "sixsense" | "madison_logic" | "hawk" | "perion" | "admixer" | "dable" | "popin" | "logly" | "gunosy" | "plista" | "zergnet" | "lockerdome" | "engageya" | "flipboard" | "rollerads" | "pushground" | "megapush" | "bidvertiser" | "seven_search" | "infolinks" | "twinred" | "adxpansion" | "cointraffic" | "a_ads" | "hypelab" | "slise" | "coinmarketcap_ads" | "coingecko_ads" | "collabstr" | "beehiiv_ads" | "sponsy" | "kit_sponsor_network" | "g2" | "trustradius" | "codefund" | "daily_dev" | "dev_to" | "techtarget" | "clutch" | "angi" | "thumbtack" | "houzz" | "two_gis" | "kayak" | "expedia_group" | "trivago" | "skyscanner" | "hopper" | "trip_com" | "airbnb" | "gumtree" | "kijiji" | "leboncoin" | "stepstone" | "appcast" | "zillow" | "billups" | "hinge" | "mixi" | "taringa" | "plurk" | "mewe" | "wattpad" | "duolingo" | "trovo" | "letterboxd" | "chingari" | "ptt" | "flickr" | "fanfiction" | "koo" | "clubhouse" | "caffeine" | "hike" | "patreon" | "vimeo" | "triller" | "pacvue" | "quartile" | "magnite" | "pubmatic" | "openx" | "index_exchange" | "sharethrough" | "sovrn" | "gumgum" | "yieldmo" | "pulsepoint" | "webgains" | "involve_asia" | "skimlinks" | "triton_digital" | "cardlytics" | "ibotta_ipn" | "mirakl_ads" | "podcorn" | "seedtag" | "karrot_daangn" | "toss_ads" | "mts_ads" | "pinduoduo" | "carousell" | "paytm_ads" | "phonepe_ads" | "zomato_ads" | "ogury" | "cognitiv" | "system1" | "boomplay" | "sber_ads" | "qoo10" | "emag_ads" | "kaspi_ads" | "nectar360" | "vinted_ads" | "foursquare_ads" | "jooble" | "talent_com" | "zoominfo_ads" | "terminus" | "ltk" | "valuecommerce" | "idealo" | "pricerunner" | "skroutz" | "heureka" | "zbozi_cz" | "ceneo" | "kevel" | "sojern" | "thrad" | "zeroclick" | "koah" | "cartology" | "coles_360" | "kohls_media_network" | "ad_retail_media" | "hepsiburada_ads" | "daisycon" | "digistore24" | "innovid" | "mediaocean_prisma" | "appnext" | "sigmob" | "topon_tradplus" | "persona_ly" | "glance" | "mediavine" | "raptive" | "ezoic" | "adpushup" | "freestar" | "playwire" | "connatix" | "jcdecaux" | "clear_channel_outdoor" | "outfront_media" | "lamar_advertising" | "moving_walls" | "adomni" | "bombora" | "metadata_io" | "influ2" | "aspire" | "creatoriq" | "upfluence" | "spreaker" | "kinective_media" | "shahid_mms_works" | "nordstrom_media_network" | "dicks_media_network" | "zitcha" | "promoted_ai" | "makemytrip_ads" | "yemeksepeti_ads" | "glance_ads" | "jioads" | "cauly" | "adpopcorn" | "i_mobile" | "microad" | "logicad" | "freakout_red" | "ximalaya_ads" | "netease_cloud_music_ads" | "gaana_ads" | "radiko_ads" | "philo_ads" | "xumo_ads" | "rakuten_viki" | "delivery_hero" | "jumia" | "tripadvisor";
       adAccountId?: string;
       campaignId?: string;
     };
     schedule: "hourly" | "daily" | "weekly";
     at?: {
-      /** default 6 */
       hour?: number;
-      /** default 0 */
       minute?: number;
-      /** 0 = Sunday; weekly only; default 1 */
       weekday?: number;
-      /** IANA zone; default UTC */
       timezone?: string;
     };
     level: "campaign" | "ad_group" | "ad";
     conditions: Array<{
       metric: "spend" | "impressions" | "clicks" | "conversions" | "ctr" | "cpc" | "cpm" | "cpa" | "roas";
       op: "gt" | "gte" | "lt" | "lte";
-      /** money metrics in the entity currency, major units */
       value: number;
       windowDays: number;
     }>;
@@ -2298,7 +2284,10 @@ export type RulesSimulateBody = {
       minConversions?: number;
       minGapPct?: number;
     };
-    minSpendForEval?: Money;
+    minSpendForEval?: {
+      micros: number;
+      currency: string;
+    };
   };
   /** default 30 */
   days?: number;
@@ -2353,13 +2342,9 @@ export type RulesSetScheduleParams = {
 export type RulesSetScheduleBody = {
   schedule: "hourly" | "daily" | "weekly";
   at?: {
-    /** default 6 */
     hour?: number;
-    /** default 0 */
     minute?: number;
-    /** 0 = Sunday; weekly only; default 1 */
     weekday?: number;
-    /** IANA zone; default UTC */
     timezone?: string;
   };
 };
@@ -2454,7 +2439,6 @@ export type SecuritySetPolicyBody = {
   sessionTtlHours?: number;
   sessionIdleMinutes?: number | null;
   apiKeyMaxAgeDays?: number | null;
-  /** per dataset: a number sets the days kept, null clears it */
   retention?: Record<string, number | null>;
 };
 export type SecuritySetPolicyResponse = SecurityPolicy;
@@ -2557,14 +2541,11 @@ export type TrackingIngestParams = {
 };
 export type TrackingIngestBody = {
   type: "page_view" | "click" | "add_to_cart" | "lead" | "purchase";
-  /** dedupe key */
   event_id?: string;
   order_id?: string;
   visitor_id: string;
-  /** major units */
   value?: number | string;
   currency?: string;
-  /** Advernue ad id from the tagged landing URL */
   adv_cid?: string;
   utm_source?: string;
   utm_medium?: string;
@@ -2583,14 +2564,11 @@ export type TrackingIngestBody = {
 } | {
   events: Array<{
     type: "page_view" | "click" | "add_to_cart" | "lead" | "purchase";
-    /** dedupe key */
     event_id?: string;
     order_id?: string;
     visitor_id: string;
-    /** major units */
     value?: number | string;
     currency?: string;
-    /** Advernue ad id from the tagged landing URL */
     adv_cid?: string;
     utm_source?: string;
     utm_medium?: string;
@@ -2621,7 +2599,6 @@ export type TrackingListIngestKeysResponse = Array<IngestKey>;
 export type TrackingCreateIngestKeyBody = {
   label: string;
   clientId?: string;
-  /** default public */
   kind?: "public" | "server";
 };
 export type TrackingCreateIngestKeyResponse = IngestKey;
@@ -2648,19 +2625,12 @@ export type RevenueCreateIntegrationBody = {
   kind: "shopify" | "stripe" | "woocommerce";
   label: string;
   clientId?: string;
-  /** Shopify client secret, Stripe whsec_, Woo secret */
   webhookSecret: string;
-  /** shopify, for backfill */
   shopDomain?: string;
-  /** shopify, for backfill */
   accessToken?: string;
-  /** stripe restricted read key, for backfill */
   apiKey?: string;
-  /** woocommerce store URL */
   baseUrl?: string;
-  /** woocommerce */
   consumerKey?: string;
-  /** woocommerce */
   consumerSecret?: string;
 };
 export type RevenueCreateIntegrationResponse = RevenueIntegration;
@@ -2764,7 +2734,6 @@ export type CreativeLibraryPlanResizeParams = {
   id: string;
 };
 export type CreativeLibraryPlanResizeBody = {
-  /** default meta, google_ads, tiktok */
   platforms?: Array<string>;
   mode?: "cover" | "contain";
   focal?: {
@@ -2808,7 +2777,6 @@ export type CreativeLibraryResizeParams = {
   id: string;
 };
 export type CreativeLibraryResizeBody = {
-  /** default meta, google_ads, tiktok */
   platforms?: Array<string>;
   mode?: "cover" | "contain";
   focal?: {
@@ -2879,10 +2847,8 @@ export type AudiencesCreateListBody = {
   clientId?: string;
   consent: {
     confirmed: true;
-    /** where the consent comes from */
     basis: string;
   };
-  /** raw contacts; hashed on receipt, never stored or returned in clear */
   rows: Array<{
     email?: string;
     phone?: string;
@@ -2923,7 +2889,6 @@ export type AudiencesCreateLookalikeBody = {
   adAccountId: string;
   sourceAudienceId: string;
   countries: Array<string>;
-  /** 0.01 is the closest 1% */
   ratio: number;
 };
 export type AudiencesCreateLookalikeResponse = {
@@ -2966,10 +2931,8 @@ export type AudiencesAddMembersParams = {
 export type AudiencesAddMembersBody = {
   consent: {
     confirmed: true;
-    /** where the consent comes from */
     basis: string;
   };
-  /** raw contacts; hashed on receipt, never stored or returned in clear */
   rows: Array<{
     email?: string;
     phone?: string;
@@ -3009,7 +2972,6 @@ export type AudiencesRemoveMembersParams = {
   id: string;
 };
 export type AudiencesRemoveMembersBody = {
-  /** raw contacts; hashed on receipt, never stored or returned in clear */
   rows: Array<{
     email?: string;
     phone?: string;
@@ -3040,17 +3002,13 @@ export type ConversionsSetIntegrationParams = {
 };
 export type ConversionsSetIntegrationBody = {
   enabled: boolean;
-  /** default purchase, lead */
   eventTypes?: Array<"page_view" | "click" | "add_to_cart" | "lead" | "purchase">;
-  /** destination ids only: pixelId, conversionActionId or pixelCode */
   config: Record<string, unknown>;
 };
 export type ConversionsSetIntegrationResponse = ConversionIntegration;
 
 export type ConversionsSendBody = {
-  /** event_id or stored row id */
   eventId: string;
-  /** raw identifiers; hashed immediately, never stored or returned */
   userData?: {
     email?: string;
     phone?: string;
@@ -3064,7 +3022,6 @@ export type ConversionsSendBody = {
     ttclid?: string;
     ttp?: string;
   };
-  /** required when userData has contact details */
   consent?: boolean;
   sourceUrl?: string;
   adAccountIds?: Array<string>;
@@ -3216,15 +3173,12 @@ export type AnalyticsTimeseriesResponse = {
 };
 
 export type AnalyticsBreakdownBody = {
-  /** geo_country (ISO-3166 alpha-2 or "unknown"), device (desktop|mobile|tablet|ctv|other), placement, creative, ad, age, gender, hour (00-23). Only platforms that report a dimension contribute rows. */
+  clientId?: string;
   dimension: "geo_country" | "device" | "placement" | "creative" | "ad" | "age" | "gender" | "hour";
   from: string;
   to: string;
-  clientId?: string;
-  /** Split each value by platform (default: merge). */
   byPlatform?: boolean;
   platforms?: Array<"google_ads" | "meta" | "tiktok" | "microsoft" | "linkedin" | "reddit" | "pinterest" | "snapchat" | "x" | "amazon" | "apple" | "taboola" | "outbrain" | "criteo" | "propellerads" | "adsterra" | "exoclick" | "trafficfactory" | "mgid" | "trafficstars" | "clickadu" | "revcontent" | "content_ad" | "thetradedesk" | "dv360" | "amazon_dsp" | "walmart" | "applovin" | "unity_ads" | "spotify" | "roku" | "roundel" | "instacart" | "kroger" | "ebay" | "alibaba" | "jd" | "mercado_ads" | "quora" | "nextdoor" | "yahoo_dsp" | "stackadapt" | "adform" | "basis" | "adskeeper" | "equativ" | "inmobi" | "trafficjunky" | "plugrush" | "clickadilla" | "juicyads" | "eroadvertising" | "impact" | "cj" | "awin" | "partnerstack" | "rakuten_advertising" | "tradedoubler" | "zeta" | "admitad" | "openai_ads" | "mintegral" | "moloco" | "huawei_petal_ads" | "liftoff" | "adswizz" | "kayzen" | "jampp" | "podscribe" | "rollworks" | "buysellads" | "ethicalads" | "avito" | "indeed" | "craigslist" | "olx" | "seek" | "adshares" | "bitmedia" | "coinzilla" | "hivestack" | "vistar" | "adquick" | "beeswax" | "simplifi" | "adroll" | "quantcast" | "epom" | "eskimi" | "bidtheatre" | "zemanta" | "viant" | "nexxen" | "mediamath" | "adobe_dsp" | "rtb_house" | "teads" | "choozle" | "roblox_ads" | "yelp" | "smartnews" | "kakao_moment" | "naver_gfa" | "nativo" | "paved" | "letterhead" | "sparkloop" | "opera_ads" | "remerge" | "zeropark" | "kadam" | "hilltopads" | "mybid" | "passionfroot" | "liveintent" | "admaven" | "adcash" | "popcash" | "mondiad" | "galaksion" | "evadav" | "popads" | "richads" | "qianchuan" | "uber_ads" | "doordash" | "bol" | "ozon" | "wildberries" | "citrusad" | "koddi" | "topsort" | "albertsons" | "shopee" | "sams_club" | "otto" | "allegro" | "temu" | "moloco_commerce" | "yandex_direct" | "baidu" | "naver_searchad" | "seznam_sklik" | "yahoo_japan_ads" | "kakao_keyword_ad" | "so_360" | "brave_ads" | "vk_ads" | "tencent_ads" | "oceanengine" | "weibo" | "dcard" | "zalo" | "digital_turbine" | "start_io" | "xiaomi_ads" | "chartboost" | "magalu" | "bidease" | "lazada" | "smadex" | "newsbreak" | "sogou" | "getintent" | "ziprecruiter" | "mobon" | "joveo" | "aarki" | "campaign_manager_360" | "tapfiliate" | "refersion" | "kelkoo" | "everflow" | "rokt" | "shopify_shop_campaigns" | "adikteev" | "tradetracker" | "partnerize" | "clickbank" | "triplelift" | "adtraction" | "kargo" | "skai" | "demandbase" | "appier" | "takealot" | "smartyads" | "flipkart" | "kuaishou" | "kwai" | "line_ads" | "xiaohongshu" | "vibe_co" | "universal_ads" | "tvscientific" | "madhive" | "rumble" | "samsung_ads" | "mntn" | "meituan" | "telegram_ads" | "mock" | "shenma" | "coccoc" | "perplexity" | "tumblr" | "discord" | "bluesky" | "graze_social" | "kick" | "bilibili" | "zhihu" | "sharechat" | "dailyhunt" | "hatena" | "pixiv" | "niconico" | "ameba" | "mastodon" | "substack" | "medium" | "stack_overflow" | "product_hunt" | "hacker_news" | "github" | "imgur" | "ninegag" | "tinder" | "bumble" | "grindr" | "strava" | "xing" | "gab" | "minds" | "bereal" | "viber" | "truecaller" | "signal" | "disney" | "tatari" | "spectrum_reach" | "ampersand" | "iqiyi" | "jiohotstar" | "zee5" | "viu" | "tver" | "soop" | "audacy" | "libsyn" | "audioboom" | "redcircle" | "gumball" | "anghami" | "etsy" | "cvs" | "ulta" | "wayfair" | "chewy" | "sephora" | "grab" | "goto" | "myntra" | "meesho" | "nykaa" | "blinkit" | "zepto" | "swiggy" | "rakuten_rpp" | "mercari" | "coupang" | "zalando" | "cdiscount" | "tesco_media" | "noon" | "trendyol" | "rappi" | "ifood" | "paypal_ads" | "chase_media" | "samsung_galaxy_store" | "oppo_ads" | "vivo_ads" | "transsion_ads" | "aptoide" | "bigo_ads" | "verve" | "yeahmobi" | "adjoe" | "mistplay" | "anzu" | "frameplay" | "admix" | "steam" | "playstation" | "nintendo" | "epic_games" | "overwolf" | "venatus" | "microsoft_invest" | "illumin" | "cadent" | "sixsense" | "madison_logic" | "hawk" | "perion" | "admixer" | "dable" | "popin" | "logly" | "gunosy" | "plista" | "zergnet" | "lockerdome" | "engageya" | "flipboard" | "rollerads" | "pushground" | "megapush" | "bidvertiser" | "seven_search" | "infolinks" | "twinred" | "adxpansion" | "cointraffic" | "a_ads" | "hypelab" | "slise" | "coinmarketcap_ads" | "coingecko_ads" | "collabstr" | "beehiiv_ads" | "sponsy" | "kit_sponsor_network" | "g2" | "trustradius" | "codefund" | "daily_dev" | "dev_to" | "techtarget" | "clutch" | "angi" | "thumbtack" | "houzz" | "two_gis" | "kayak" | "expedia_group" | "trivago" | "skyscanner" | "hopper" | "trip_com" | "airbnb" | "gumtree" | "kijiji" | "leboncoin" | "stepstone" | "appcast" | "zillow" | "billups" | "hinge" | "mixi" | "taringa" | "plurk" | "mewe" | "wattpad" | "duolingo" | "trovo" | "letterboxd" | "chingari" | "ptt" | "flickr" | "fanfiction" | "koo" | "clubhouse" | "caffeine" | "hike" | "patreon" | "vimeo" | "triller" | "pacvue" | "quartile" | "magnite" | "pubmatic" | "openx" | "index_exchange" | "sharethrough" | "sovrn" | "gumgum" | "yieldmo" | "pulsepoint" | "webgains" | "involve_asia" | "skimlinks" | "triton_digital" | "cardlytics" | "ibotta_ipn" | "mirakl_ads" | "podcorn" | "seedtag" | "karrot_daangn" | "toss_ads" | "mts_ads" | "pinduoduo" | "carousell" | "paytm_ads" | "phonepe_ads" | "zomato_ads" | "ogury" | "cognitiv" | "system1" | "boomplay" | "sber_ads" | "qoo10" | "emag_ads" | "kaspi_ads" | "nectar360" | "vinted_ads" | "foursquare_ads" | "jooble" | "talent_com" | "zoominfo_ads" | "terminus" | "ltk" | "valuecommerce" | "idealo" | "pricerunner" | "skroutz" | "heureka" | "zbozi_cz" | "ceneo" | "kevel" | "sojern" | "thrad" | "zeroclick" | "koah" | "cartology" | "coles_360" | "kohls_media_network" | "ad_retail_media" | "hepsiburada_ads" | "daisycon" | "digistore24" | "innovid" | "mediaocean_prisma" | "appnext" | "sigmob" | "topon_tradplus" | "persona_ly" | "glance" | "mediavine" | "raptive" | "ezoic" | "adpushup" | "freestar" | "playwire" | "connatix" | "jcdecaux" | "clear_channel_outdoor" | "outfront_media" | "lamar_advertising" | "moving_walls" | "adomni" | "bombora" | "metadata_io" | "influ2" | "aspire" | "creatoriq" | "upfluence" | "spreaker" | "kinective_media" | "shahid_mms_works" | "nordstrom_media_network" | "dicks_media_network" | "zitcha" | "promoted_ai" | "makemytrip_ads" | "yemeksepeti_ads" | "glance_ads" | "jioads" | "cauly" | "adpopcorn" | "i_mobile" | "microad" | "logicad" | "freakout_red" | "ximalaya_ads" | "netease_cloud_music_ads" | "gaana_ads" | "radiko_ads" | "philo_ads" | "xumo_ads" | "rakuten_viki" | "delivery_hero" | "jumia" | "tripadvisor">;
-  /** Reporting currency (ISO-4217). */
   currency?: string;
   limit?: number;
 };
@@ -3267,7 +3221,6 @@ export type AnalyticsBreakdownResponse = {
 
 export type AnalyticsPacingBody = {
   clientId?: string;
-  /** Reporting currency; default: the client one */
   currency?: string;
   campaignId?: string;
   crossCampaignId?: string;
@@ -3363,7 +3316,6 @@ export type AnalyticsPacingResponse = {
 
 export type AnalyticsForecastBody = {
   clientId?: string;
-  /** Reporting currency; default: the client one */
   currency?: string;
   campaignId?: string;
   crossCampaignId?: string;
@@ -3486,7 +3438,6 @@ export type AnalyticsForecastResponse = {
 
 export type AnalyticsSynergyBody = {
   clientId?: string;
-  /** Reporting currency; default: the client one */
   currency?: string;
   campaignId?: string;
   crossCampaignId?: string;
@@ -3561,7 +3512,6 @@ export type AnalyticsSynergyResponse = {
 
 export type AnalyticsSaturationBody = {
   clientId?: string;
-  /** Reporting currency; default: the client one */
   currency?: string;
   campaignId?: string;
   crossCampaignId?: string;
@@ -3605,7 +3555,6 @@ export type AnalyticsSaturationResponse = {
 
 export type AnalyticsReallocationBody = {
   clientId?: string;
-  /** Reporting currency; default: the client one */
   currency?: string;
   campaignId?: string;
   crossCampaignId?: string;

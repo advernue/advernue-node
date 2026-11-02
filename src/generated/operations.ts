@@ -59,7 +59,6 @@ export const operations: Record<string, OperationMeta> = {
          "maxLength": 80
         },
         "limit": {
-         "description": "Row cap for ranked tables.",
          "type": "integer",
          "minimum": 1,
          "maximum": 50
@@ -133,7 +132,6 @@ export const operations: Record<string, OperationMeta> = {
          "maxLength": 80
         },
         "limit": {
-         "description": "Row cap for ranked tables.",
          "type": "integer",
          "minimum": 1,
          "maximum": 50
@@ -202,12 +200,6 @@ export const operations: Record<string, OperationMeta> = {
    "schema": {
     "type": "object",
     "properties": {
-     "clientId": {
-      "type": "string"
-     },
-     "templateId": {
-      "type": "string"
-     },
      "frequency": {
       "type": "string",
       "enum": [
@@ -233,14 +225,18 @@ export const operations: Record<string, OperationMeta> = {
       "minimum": 0,
       "maximum": 23
      },
+     "clientId": {
+      "type": "string"
+     },
+     "templateId": {
+      "type": "string"
+     },
      "recipients": {
       "default": [],
       "maxItems": 20,
       "type": "array",
       "items": {
-       "type": "string",
-       "format": "email",
-       "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+       "type": "string"
       }
      },
      "enabled": {
@@ -249,9 +245,9 @@ export const operations: Record<string, OperationMeta> = {
      }
     },
     "required": [
+     "frequency",
      "clientId",
-     "templateId",
-     "frequency"
+     "templateId"
     ]
    }
   },
@@ -311,9 +307,7 @@ export const operations: Record<string, OperationMeta> = {
       "maxItems": 20,
       "type": "array",
       "items": {
-       "type": "string",
-       "format": "email",
-       "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+       "type": "string"
       }
      },
      "enabled": {
@@ -398,7 +392,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "templateId": {
-      "description": "Default: all sections.",
       "type": "string"
      },
      "from": {
@@ -520,9 +513,7 @@ export const operations: Record<string, OperationMeta> = {
       "maxItems": 20,
       "type": "array",
       "items": {
-       "type": "string",
-       "format": "email",
-       "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+       "type": "string"
       }
      }
     },
@@ -671,10 +662,14 @@ export const operations: Record<string, OperationMeta> = {
       "maxLength": 80
      },
      "logoUrl": {
-      "description": "data:image/(png|jpeg|webp|gif);base64 URI, ~250 KB max.",
-      "type": [
-       "string",
-       "null"
+      "anyOf": [
+       {
+        "type": "string",
+        "pattern": "^data:image\\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]{1,350000}$"
+       },
+       {
+        "type": "null"
+       }
       ]
      },
      "primaryColor": {
@@ -686,10 +681,14 @@ export const operations: Record<string, OperationMeta> = {
       "pattern": "^#[0-9a-fA-F]{6}$"
      },
      "customDomain": {
-      "description": "Hostname; informational (DNS is not managed).",
-      "type": [
-       "string",
-       "null"
+      "anyOf": [
+       {
+        "type": "string",
+        "pattern": "^(?=.{4,253}$)([a-z0-9-]{1,63}\\.)+[a-z]{2,63}$"
+       },
+       {
+        "type": "null"
+       }
       ]
      },
      "fromName": {
@@ -998,6 +997,7 @@ export const operations: Record<string, OperationMeta> = {
       ]
      },
      "permissions": {
+      "maxItems": 2,
       "type": "array",
       "items": {
        "type": "string",
@@ -1066,9 +1066,7 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "email": {
-      "type": "string",
-      "format": "email",
-      "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+      "type": "string"
      },
      "role": {
       "type": "string",
@@ -1083,7 +1081,7 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "permissions": {
-      "description": "manager and viewer only.",
+      "maxItems": 2,
       "type": "array",
       "items": {
        "type": "string",
@@ -1283,9 +1281,7 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string",
       "minLength": 1
      },
-     "definition": {
-      "description": "Must match the guardrail or automation schema for `kind`."
-     },
+     "definition": {},
      "clientId": {
       "type": "string"
      },
@@ -1791,8 +1787,7 @@ export const operations: Record<string, OperationMeta> = {
       "propertyNames": {
        "type": "string"
       },
-      "additionalProperties": {},
-      "description": "Write-only: urls, passwords, signing secrets. Never returned; see hasSecret."
+      "additionalProperties": {}
      }
     },
     "required": [
@@ -1837,7 +1832,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "boolean"
      },
      "config": {
-      "description": "Changing config requires `secret` again.",
       "type": "object",
       "propertyNames": {
        "type": "string"
@@ -1849,8 +1843,7 @@ export const operations: Record<string, OperationMeta> = {
       "propertyNames": {
        "type": "string"
       },
-      "additionalProperties": {},
-      "description": "Write-only: urls, passwords, signing secrets. Never returned; see hasSecret."
+      "additionalProperties": {}
      }
     }
    }
@@ -2433,9 +2426,7 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "email": {
-      "type": "string",
-      "format": "email",
-      "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+      "type": "string"
      },
      "password": {
       "type": "string",
@@ -2481,9 +2472,7 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "email": {
-      "type": "string",
-      "format": "email",
-      "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+      "type": "string"
      },
      "password": {
       "type": "string",
@@ -3532,7 +3521,504 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "platform": {
-      "$ref": "#/$defs/Platform"
+      "type": "string",
+      "enum": [
+       "google_ads",
+       "meta",
+       "tiktok",
+       "microsoft",
+       "linkedin",
+       "reddit",
+       "pinterest",
+       "snapchat",
+       "x",
+       "amazon",
+       "apple",
+       "taboola",
+       "outbrain",
+       "criteo",
+       "propellerads",
+       "adsterra",
+       "exoclick",
+       "trafficfactory",
+       "mgid",
+       "trafficstars",
+       "clickadu",
+       "revcontent",
+       "content_ad",
+       "thetradedesk",
+       "dv360",
+       "amazon_dsp",
+       "walmart",
+       "applovin",
+       "unity_ads",
+       "spotify",
+       "roku",
+       "roundel",
+       "instacart",
+       "kroger",
+       "ebay",
+       "alibaba",
+       "jd",
+       "mercado_ads",
+       "quora",
+       "nextdoor",
+       "yahoo_dsp",
+       "stackadapt",
+       "adform",
+       "basis",
+       "adskeeper",
+       "equativ",
+       "inmobi",
+       "trafficjunky",
+       "plugrush",
+       "clickadilla",
+       "juicyads",
+       "eroadvertising",
+       "impact",
+       "cj",
+       "awin",
+       "partnerstack",
+       "rakuten_advertising",
+       "tradedoubler",
+       "zeta",
+       "admitad",
+       "openai_ads",
+       "mintegral",
+       "moloco",
+       "huawei_petal_ads",
+       "liftoff",
+       "adswizz",
+       "kayzen",
+       "jampp",
+       "podscribe",
+       "rollworks",
+       "buysellads",
+       "ethicalads",
+       "avito",
+       "indeed",
+       "craigslist",
+       "olx",
+       "seek",
+       "adshares",
+       "bitmedia",
+       "coinzilla",
+       "hivestack",
+       "vistar",
+       "adquick",
+       "beeswax",
+       "simplifi",
+       "adroll",
+       "quantcast",
+       "epom",
+       "eskimi",
+       "bidtheatre",
+       "zemanta",
+       "viant",
+       "nexxen",
+       "mediamath",
+       "adobe_dsp",
+       "rtb_house",
+       "teads",
+       "choozle",
+       "roblox_ads",
+       "yelp",
+       "smartnews",
+       "kakao_moment",
+       "naver_gfa",
+       "nativo",
+       "paved",
+       "letterhead",
+       "sparkloop",
+       "opera_ads",
+       "remerge",
+       "zeropark",
+       "kadam",
+       "hilltopads",
+       "mybid",
+       "passionfroot",
+       "liveintent",
+       "admaven",
+       "adcash",
+       "popcash",
+       "mondiad",
+       "galaksion",
+       "evadav",
+       "popads",
+       "richads",
+       "qianchuan",
+       "uber_ads",
+       "doordash",
+       "bol",
+       "ozon",
+       "wildberries",
+       "citrusad",
+       "koddi",
+       "topsort",
+       "albertsons",
+       "shopee",
+       "sams_club",
+       "otto",
+       "allegro",
+       "temu",
+       "moloco_commerce",
+       "yandex_direct",
+       "baidu",
+       "naver_searchad",
+       "seznam_sklik",
+       "yahoo_japan_ads",
+       "kakao_keyword_ad",
+       "so_360",
+       "brave_ads",
+       "vk_ads",
+       "tencent_ads",
+       "oceanengine",
+       "weibo",
+       "dcard",
+       "zalo",
+       "digital_turbine",
+       "start_io",
+       "xiaomi_ads",
+       "chartboost",
+       "magalu",
+       "bidease",
+       "lazada",
+       "smadex",
+       "newsbreak",
+       "sogou",
+       "getintent",
+       "ziprecruiter",
+       "mobon",
+       "joveo",
+       "aarki",
+       "campaign_manager_360",
+       "tapfiliate",
+       "refersion",
+       "kelkoo",
+       "everflow",
+       "rokt",
+       "shopify_shop_campaigns",
+       "adikteev",
+       "tradetracker",
+       "partnerize",
+       "clickbank",
+       "triplelift",
+       "adtraction",
+       "kargo",
+       "skai",
+       "demandbase",
+       "appier",
+       "takealot",
+       "smartyads",
+       "flipkart",
+       "kuaishou",
+       "kwai",
+       "line_ads",
+       "xiaohongshu",
+       "vibe_co",
+       "universal_ads",
+       "tvscientific",
+       "madhive",
+       "rumble",
+       "samsung_ads",
+       "mntn",
+       "meituan",
+       "telegram_ads",
+       "mock",
+       "shenma",
+       "coccoc",
+       "perplexity",
+       "tumblr",
+       "discord",
+       "bluesky",
+       "graze_social",
+       "kick",
+       "bilibili",
+       "zhihu",
+       "sharechat",
+       "dailyhunt",
+       "hatena",
+       "pixiv",
+       "niconico",
+       "ameba",
+       "mastodon",
+       "substack",
+       "medium",
+       "stack_overflow",
+       "product_hunt",
+       "hacker_news",
+       "github",
+       "imgur",
+       "ninegag",
+       "tinder",
+       "bumble",
+       "grindr",
+       "strava",
+       "xing",
+       "gab",
+       "minds",
+       "bereal",
+       "viber",
+       "truecaller",
+       "signal",
+       "disney",
+       "tatari",
+       "spectrum_reach",
+       "ampersand",
+       "iqiyi",
+       "jiohotstar",
+       "zee5",
+       "viu",
+       "tver",
+       "soop",
+       "audacy",
+       "libsyn",
+       "audioboom",
+       "redcircle",
+       "gumball",
+       "anghami",
+       "etsy",
+       "cvs",
+       "ulta",
+       "wayfair",
+       "chewy",
+       "sephora",
+       "grab",
+       "goto",
+       "myntra",
+       "meesho",
+       "nykaa",
+       "blinkit",
+       "zepto",
+       "swiggy",
+       "rakuten_rpp",
+       "mercari",
+       "coupang",
+       "zalando",
+       "cdiscount",
+       "tesco_media",
+       "noon",
+       "trendyol",
+       "rappi",
+       "ifood",
+       "paypal_ads",
+       "chase_media",
+       "samsung_galaxy_store",
+       "oppo_ads",
+       "vivo_ads",
+       "transsion_ads",
+       "aptoide",
+       "bigo_ads",
+       "verve",
+       "yeahmobi",
+       "adjoe",
+       "mistplay",
+       "anzu",
+       "frameplay",
+       "admix",
+       "steam",
+       "playstation",
+       "nintendo",
+       "epic_games",
+       "overwolf",
+       "venatus",
+       "microsoft_invest",
+       "illumin",
+       "cadent",
+       "sixsense",
+       "madison_logic",
+       "hawk",
+       "perion",
+       "admixer",
+       "dable",
+       "popin",
+       "logly",
+       "gunosy",
+       "plista",
+       "zergnet",
+       "lockerdome",
+       "engageya",
+       "flipboard",
+       "rollerads",
+       "pushground",
+       "megapush",
+       "bidvertiser",
+       "seven_search",
+       "infolinks",
+       "twinred",
+       "adxpansion",
+       "cointraffic",
+       "a_ads",
+       "hypelab",
+       "slise",
+       "coinmarketcap_ads",
+       "coingecko_ads",
+       "collabstr",
+       "beehiiv_ads",
+       "sponsy",
+       "kit_sponsor_network",
+       "g2",
+       "trustradius",
+       "codefund",
+       "daily_dev",
+       "dev_to",
+       "techtarget",
+       "clutch",
+       "angi",
+       "thumbtack",
+       "houzz",
+       "two_gis",
+       "kayak",
+       "expedia_group",
+       "trivago",
+       "skyscanner",
+       "hopper",
+       "trip_com",
+       "airbnb",
+       "gumtree",
+       "kijiji",
+       "leboncoin",
+       "stepstone",
+       "appcast",
+       "zillow",
+       "billups",
+       "hinge",
+       "mixi",
+       "taringa",
+       "plurk",
+       "mewe",
+       "wattpad",
+       "duolingo",
+       "trovo",
+       "letterboxd",
+       "chingari",
+       "ptt",
+       "flickr",
+       "fanfiction",
+       "koo",
+       "clubhouse",
+       "caffeine",
+       "hike",
+       "patreon",
+       "vimeo",
+       "triller",
+       "pacvue",
+       "quartile",
+       "magnite",
+       "pubmatic",
+       "openx",
+       "index_exchange",
+       "sharethrough",
+       "sovrn",
+       "gumgum",
+       "yieldmo",
+       "pulsepoint",
+       "webgains",
+       "involve_asia",
+       "skimlinks",
+       "triton_digital",
+       "cardlytics",
+       "ibotta_ipn",
+       "mirakl_ads",
+       "podcorn",
+       "seedtag",
+       "karrot_daangn",
+       "toss_ads",
+       "mts_ads",
+       "pinduoduo",
+       "carousell",
+       "paytm_ads",
+       "phonepe_ads",
+       "zomato_ads",
+       "ogury",
+       "cognitiv",
+       "system1",
+       "boomplay",
+       "sber_ads",
+       "qoo10",
+       "emag_ads",
+       "kaspi_ads",
+       "nectar360",
+       "vinted_ads",
+       "foursquare_ads",
+       "jooble",
+       "talent_com",
+       "zoominfo_ads",
+       "terminus",
+       "ltk",
+       "valuecommerce",
+       "idealo",
+       "pricerunner",
+       "skroutz",
+       "heureka",
+       "zbozi_cz",
+       "ceneo",
+       "kevel",
+       "sojern",
+       "thrad",
+       "zeroclick",
+       "koah",
+       "cartology",
+       "coles_360",
+       "kohls_media_network",
+       "ad_retail_media",
+       "hepsiburada_ads",
+       "daisycon",
+       "digistore24",
+       "innovid",
+       "mediaocean_prisma",
+       "appnext",
+       "sigmob",
+       "topon_tradplus",
+       "persona_ly",
+       "glance",
+       "mediavine",
+       "raptive",
+       "ezoic",
+       "adpushup",
+       "freestar",
+       "playwire",
+       "connatix",
+       "jcdecaux",
+       "clear_channel_outdoor",
+       "outfront_media",
+       "lamar_advertising",
+       "moving_walls",
+       "adomni",
+       "bombora",
+       "metadata_io",
+       "influ2",
+       "aspire",
+       "creatoriq",
+       "upfluence",
+       "spreaker",
+       "kinective_media",
+       "shahid_mms_works",
+       "nordstrom_media_network",
+       "dicks_media_network",
+       "zitcha",
+       "promoted_ai",
+       "makemytrip_ads",
+       "yemeksepeti_ads",
+       "glance_ads",
+       "jioads",
+       "cauly",
+       "adpopcorn",
+       "i_mobile",
+       "microad",
+       "logicad",
+       "freakout_red",
+       "ximalaya_ads",
+       "netease_cloud_music_ads",
+       "gaana_ads",
+       "radiko_ads",
+       "philo_ads",
+       "xumo_ads",
+       "rakuten_viki",
+       "delivery_hero",
+       "jumia",
+       "tripadvisor"
+      ]
      },
      "label": {
       "type": "string",
@@ -3543,8 +4029,7 @@ export const operations: Record<string, OperationMeta> = {
       "propertyNames": {
        "type": "string"
       },
-      "additionalProperties": {},
-      "description": "write-only; fields depend on the platform (see platforms catalog credentialFields)"
+      "additionalProperties": {}
      }
     },
     "required": [
@@ -3650,7 +4135,504 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "platform": {
-      "$ref": "#/$defs/Platform"
+      "type": "string",
+      "enum": [
+       "google_ads",
+       "meta",
+       "tiktok",
+       "microsoft",
+       "linkedin",
+       "reddit",
+       "pinterest",
+       "snapchat",
+       "x",
+       "amazon",
+       "apple",
+       "taboola",
+       "outbrain",
+       "criteo",
+       "propellerads",
+       "adsterra",
+       "exoclick",
+       "trafficfactory",
+       "mgid",
+       "trafficstars",
+       "clickadu",
+       "revcontent",
+       "content_ad",
+       "thetradedesk",
+       "dv360",
+       "amazon_dsp",
+       "walmart",
+       "applovin",
+       "unity_ads",
+       "spotify",
+       "roku",
+       "roundel",
+       "instacart",
+       "kroger",
+       "ebay",
+       "alibaba",
+       "jd",
+       "mercado_ads",
+       "quora",
+       "nextdoor",
+       "yahoo_dsp",
+       "stackadapt",
+       "adform",
+       "basis",
+       "adskeeper",
+       "equativ",
+       "inmobi",
+       "trafficjunky",
+       "plugrush",
+       "clickadilla",
+       "juicyads",
+       "eroadvertising",
+       "impact",
+       "cj",
+       "awin",
+       "partnerstack",
+       "rakuten_advertising",
+       "tradedoubler",
+       "zeta",
+       "admitad",
+       "openai_ads",
+       "mintegral",
+       "moloco",
+       "huawei_petal_ads",
+       "liftoff",
+       "adswizz",
+       "kayzen",
+       "jampp",
+       "podscribe",
+       "rollworks",
+       "buysellads",
+       "ethicalads",
+       "avito",
+       "indeed",
+       "craigslist",
+       "olx",
+       "seek",
+       "adshares",
+       "bitmedia",
+       "coinzilla",
+       "hivestack",
+       "vistar",
+       "adquick",
+       "beeswax",
+       "simplifi",
+       "adroll",
+       "quantcast",
+       "epom",
+       "eskimi",
+       "bidtheatre",
+       "zemanta",
+       "viant",
+       "nexxen",
+       "mediamath",
+       "adobe_dsp",
+       "rtb_house",
+       "teads",
+       "choozle",
+       "roblox_ads",
+       "yelp",
+       "smartnews",
+       "kakao_moment",
+       "naver_gfa",
+       "nativo",
+       "paved",
+       "letterhead",
+       "sparkloop",
+       "opera_ads",
+       "remerge",
+       "zeropark",
+       "kadam",
+       "hilltopads",
+       "mybid",
+       "passionfroot",
+       "liveintent",
+       "admaven",
+       "adcash",
+       "popcash",
+       "mondiad",
+       "galaksion",
+       "evadav",
+       "popads",
+       "richads",
+       "qianchuan",
+       "uber_ads",
+       "doordash",
+       "bol",
+       "ozon",
+       "wildberries",
+       "citrusad",
+       "koddi",
+       "topsort",
+       "albertsons",
+       "shopee",
+       "sams_club",
+       "otto",
+       "allegro",
+       "temu",
+       "moloco_commerce",
+       "yandex_direct",
+       "baidu",
+       "naver_searchad",
+       "seznam_sklik",
+       "yahoo_japan_ads",
+       "kakao_keyword_ad",
+       "so_360",
+       "brave_ads",
+       "vk_ads",
+       "tencent_ads",
+       "oceanengine",
+       "weibo",
+       "dcard",
+       "zalo",
+       "digital_turbine",
+       "start_io",
+       "xiaomi_ads",
+       "chartboost",
+       "magalu",
+       "bidease",
+       "lazada",
+       "smadex",
+       "newsbreak",
+       "sogou",
+       "getintent",
+       "ziprecruiter",
+       "mobon",
+       "joveo",
+       "aarki",
+       "campaign_manager_360",
+       "tapfiliate",
+       "refersion",
+       "kelkoo",
+       "everflow",
+       "rokt",
+       "shopify_shop_campaigns",
+       "adikteev",
+       "tradetracker",
+       "partnerize",
+       "clickbank",
+       "triplelift",
+       "adtraction",
+       "kargo",
+       "skai",
+       "demandbase",
+       "appier",
+       "takealot",
+       "smartyads",
+       "flipkart",
+       "kuaishou",
+       "kwai",
+       "line_ads",
+       "xiaohongshu",
+       "vibe_co",
+       "universal_ads",
+       "tvscientific",
+       "madhive",
+       "rumble",
+       "samsung_ads",
+       "mntn",
+       "meituan",
+       "telegram_ads",
+       "mock",
+       "shenma",
+       "coccoc",
+       "perplexity",
+       "tumblr",
+       "discord",
+       "bluesky",
+       "graze_social",
+       "kick",
+       "bilibili",
+       "zhihu",
+       "sharechat",
+       "dailyhunt",
+       "hatena",
+       "pixiv",
+       "niconico",
+       "ameba",
+       "mastodon",
+       "substack",
+       "medium",
+       "stack_overflow",
+       "product_hunt",
+       "hacker_news",
+       "github",
+       "imgur",
+       "ninegag",
+       "tinder",
+       "bumble",
+       "grindr",
+       "strava",
+       "xing",
+       "gab",
+       "minds",
+       "bereal",
+       "viber",
+       "truecaller",
+       "signal",
+       "disney",
+       "tatari",
+       "spectrum_reach",
+       "ampersand",
+       "iqiyi",
+       "jiohotstar",
+       "zee5",
+       "viu",
+       "tver",
+       "soop",
+       "audacy",
+       "libsyn",
+       "audioboom",
+       "redcircle",
+       "gumball",
+       "anghami",
+       "etsy",
+       "cvs",
+       "ulta",
+       "wayfair",
+       "chewy",
+       "sephora",
+       "grab",
+       "goto",
+       "myntra",
+       "meesho",
+       "nykaa",
+       "blinkit",
+       "zepto",
+       "swiggy",
+       "rakuten_rpp",
+       "mercari",
+       "coupang",
+       "zalando",
+       "cdiscount",
+       "tesco_media",
+       "noon",
+       "trendyol",
+       "rappi",
+       "ifood",
+       "paypal_ads",
+       "chase_media",
+       "samsung_galaxy_store",
+       "oppo_ads",
+       "vivo_ads",
+       "transsion_ads",
+       "aptoide",
+       "bigo_ads",
+       "verve",
+       "yeahmobi",
+       "adjoe",
+       "mistplay",
+       "anzu",
+       "frameplay",
+       "admix",
+       "steam",
+       "playstation",
+       "nintendo",
+       "epic_games",
+       "overwolf",
+       "venatus",
+       "microsoft_invest",
+       "illumin",
+       "cadent",
+       "sixsense",
+       "madison_logic",
+       "hawk",
+       "perion",
+       "admixer",
+       "dable",
+       "popin",
+       "logly",
+       "gunosy",
+       "plista",
+       "zergnet",
+       "lockerdome",
+       "engageya",
+       "flipboard",
+       "rollerads",
+       "pushground",
+       "megapush",
+       "bidvertiser",
+       "seven_search",
+       "infolinks",
+       "twinred",
+       "adxpansion",
+       "cointraffic",
+       "a_ads",
+       "hypelab",
+       "slise",
+       "coinmarketcap_ads",
+       "coingecko_ads",
+       "collabstr",
+       "beehiiv_ads",
+       "sponsy",
+       "kit_sponsor_network",
+       "g2",
+       "trustradius",
+       "codefund",
+       "daily_dev",
+       "dev_to",
+       "techtarget",
+       "clutch",
+       "angi",
+       "thumbtack",
+       "houzz",
+       "two_gis",
+       "kayak",
+       "expedia_group",
+       "trivago",
+       "skyscanner",
+       "hopper",
+       "trip_com",
+       "airbnb",
+       "gumtree",
+       "kijiji",
+       "leboncoin",
+       "stepstone",
+       "appcast",
+       "zillow",
+       "billups",
+       "hinge",
+       "mixi",
+       "taringa",
+       "plurk",
+       "mewe",
+       "wattpad",
+       "duolingo",
+       "trovo",
+       "letterboxd",
+       "chingari",
+       "ptt",
+       "flickr",
+       "fanfiction",
+       "koo",
+       "clubhouse",
+       "caffeine",
+       "hike",
+       "patreon",
+       "vimeo",
+       "triller",
+       "pacvue",
+       "quartile",
+       "magnite",
+       "pubmatic",
+       "openx",
+       "index_exchange",
+       "sharethrough",
+       "sovrn",
+       "gumgum",
+       "yieldmo",
+       "pulsepoint",
+       "webgains",
+       "involve_asia",
+       "skimlinks",
+       "triton_digital",
+       "cardlytics",
+       "ibotta_ipn",
+       "mirakl_ads",
+       "podcorn",
+       "seedtag",
+       "karrot_daangn",
+       "toss_ads",
+       "mts_ads",
+       "pinduoduo",
+       "carousell",
+       "paytm_ads",
+       "phonepe_ads",
+       "zomato_ads",
+       "ogury",
+       "cognitiv",
+       "system1",
+       "boomplay",
+       "sber_ads",
+       "qoo10",
+       "emag_ads",
+       "kaspi_ads",
+       "nectar360",
+       "vinted_ads",
+       "foursquare_ads",
+       "jooble",
+       "talent_com",
+       "zoominfo_ads",
+       "terminus",
+       "ltk",
+       "valuecommerce",
+       "idealo",
+       "pricerunner",
+       "skroutz",
+       "heureka",
+       "zbozi_cz",
+       "ceneo",
+       "kevel",
+       "sojern",
+       "thrad",
+       "zeroclick",
+       "koah",
+       "cartology",
+       "coles_360",
+       "kohls_media_network",
+       "ad_retail_media",
+       "hepsiburada_ads",
+       "daisycon",
+       "digistore24",
+       "innovid",
+       "mediaocean_prisma",
+       "appnext",
+       "sigmob",
+       "topon_tradplus",
+       "persona_ly",
+       "glance",
+       "mediavine",
+       "raptive",
+       "ezoic",
+       "adpushup",
+       "freestar",
+       "playwire",
+       "connatix",
+       "jcdecaux",
+       "clear_channel_outdoor",
+       "outfront_media",
+       "lamar_advertising",
+       "moving_walls",
+       "adomni",
+       "bombora",
+       "metadata_io",
+       "influ2",
+       "aspire",
+       "creatoriq",
+       "upfluence",
+       "spreaker",
+       "kinective_media",
+       "shahid_mms_works",
+       "nordstrom_media_network",
+       "dicks_media_network",
+       "zitcha",
+       "promoted_ai",
+       "makemytrip_ads",
+       "yemeksepeti_ads",
+       "glance_ads",
+       "jioads",
+       "cauly",
+       "adpopcorn",
+       "i_mobile",
+       "microad",
+       "logicad",
+       "freakout_red",
+       "ximalaya_ads",
+       "netease_cloud_music_ads",
+       "gaana_ads",
+       "radiko_ads",
+       "philo_ads",
+       "xumo_ads",
+       "rakuten_viki",
+       "delivery_hero",
+       "jumia",
+       "tripadvisor"
+      ]
      },
      "label": {
       "type": "string",
@@ -3661,8 +4643,7 @@ export const operations: Record<string, OperationMeta> = {
       "propertyNames": {
        "type": "string"
       },
-      "additionalProperties": {},
-      "description": "write-only; fields depend on the platform (see platforms catalog credentialFields)"
+      "additionalProperties": {}
      }
     },
     "required": [
@@ -3933,7 +4914,504 @@ export const operations: Record<string, OperationMeta> = {
           "type": "string"
          },
          "platform": {
-          "$ref": "#/$defs/Platform"
+          "type": "string",
+          "enum": [
+           "google_ads",
+           "meta",
+           "tiktok",
+           "microsoft",
+           "linkedin",
+           "reddit",
+           "pinterest",
+           "snapchat",
+           "x",
+           "amazon",
+           "apple",
+           "taboola",
+           "outbrain",
+           "criteo",
+           "propellerads",
+           "adsterra",
+           "exoclick",
+           "trafficfactory",
+           "mgid",
+           "trafficstars",
+           "clickadu",
+           "revcontent",
+           "content_ad",
+           "thetradedesk",
+           "dv360",
+           "amazon_dsp",
+           "walmart",
+           "applovin",
+           "unity_ads",
+           "spotify",
+           "roku",
+           "roundel",
+           "instacart",
+           "kroger",
+           "ebay",
+           "alibaba",
+           "jd",
+           "mercado_ads",
+           "quora",
+           "nextdoor",
+           "yahoo_dsp",
+           "stackadapt",
+           "adform",
+           "basis",
+           "adskeeper",
+           "equativ",
+           "inmobi",
+           "trafficjunky",
+           "plugrush",
+           "clickadilla",
+           "juicyads",
+           "eroadvertising",
+           "impact",
+           "cj",
+           "awin",
+           "partnerstack",
+           "rakuten_advertising",
+           "tradedoubler",
+           "zeta",
+           "admitad",
+           "openai_ads",
+           "mintegral",
+           "moloco",
+           "huawei_petal_ads",
+           "liftoff",
+           "adswizz",
+           "kayzen",
+           "jampp",
+           "podscribe",
+           "rollworks",
+           "buysellads",
+           "ethicalads",
+           "avito",
+           "indeed",
+           "craigslist",
+           "olx",
+           "seek",
+           "adshares",
+           "bitmedia",
+           "coinzilla",
+           "hivestack",
+           "vistar",
+           "adquick",
+           "beeswax",
+           "simplifi",
+           "adroll",
+           "quantcast",
+           "epom",
+           "eskimi",
+           "bidtheatre",
+           "zemanta",
+           "viant",
+           "nexxen",
+           "mediamath",
+           "adobe_dsp",
+           "rtb_house",
+           "teads",
+           "choozle",
+           "roblox_ads",
+           "yelp",
+           "smartnews",
+           "kakao_moment",
+           "naver_gfa",
+           "nativo",
+           "paved",
+           "letterhead",
+           "sparkloop",
+           "opera_ads",
+           "remerge",
+           "zeropark",
+           "kadam",
+           "hilltopads",
+           "mybid",
+           "passionfroot",
+           "liveintent",
+           "admaven",
+           "adcash",
+           "popcash",
+           "mondiad",
+           "galaksion",
+           "evadav",
+           "popads",
+           "richads",
+           "qianchuan",
+           "uber_ads",
+           "doordash",
+           "bol",
+           "ozon",
+           "wildberries",
+           "citrusad",
+           "koddi",
+           "topsort",
+           "albertsons",
+           "shopee",
+           "sams_club",
+           "otto",
+           "allegro",
+           "temu",
+           "moloco_commerce",
+           "yandex_direct",
+           "baidu",
+           "naver_searchad",
+           "seznam_sklik",
+           "yahoo_japan_ads",
+           "kakao_keyword_ad",
+           "so_360",
+           "brave_ads",
+           "vk_ads",
+           "tencent_ads",
+           "oceanengine",
+           "weibo",
+           "dcard",
+           "zalo",
+           "digital_turbine",
+           "start_io",
+           "xiaomi_ads",
+           "chartboost",
+           "magalu",
+           "bidease",
+           "lazada",
+           "smadex",
+           "newsbreak",
+           "sogou",
+           "getintent",
+           "ziprecruiter",
+           "mobon",
+           "joveo",
+           "aarki",
+           "campaign_manager_360",
+           "tapfiliate",
+           "refersion",
+           "kelkoo",
+           "everflow",
+           "rokt",
+           "shopify_shop_campaigns",
+           "adikteev",
+           "tradetracker",
+           "partnerize",
+           "clickbank",
+           "triplelift",
+           "adtraction",
+           "kargo",
+           "skai",
+           "demandbase",
+           "appier",
+           "takealot",
+           "smartyads",
+           "flipkart",
+           "kuaishou",
+           "kwai",
+           "line_ads",
+           "xiaohongshu",
+           "vibe_co",
+           "universal_ads",
+           "tvscientific",
+           "madhive",
+           "rumble",
+           "samsung_ads",
+           "mntn",
+           "meituan",
+           "telegram_ads",
+           "mock",
+           "shenma",
+           "coccoc",
+           "perplexity",
+           "tumblr",
+           "discord",
+           "bluesky",
+           "graze_social",
+           "kick",
+           "bilibili",
+           "zhihu",
+           "sharechat",
+           "dailyhunt",
+           "hatena",
+           "pixiv",
+           "niconico",
+           "ameba",
+           "mastodon",
+           "substack",
+           "medium",
+           "stack_overflow",
+           "product_hunt",
+           "hacker_news",
+           "github",
+           "imgur",
+           "ninegag",
+           "tinder",
+           "bumble",
+           "grindr",
+           "strava",
+           "xing",
+           "gab",
+           "minds",
+           "bereal",
+           "viber",
+           "truecaller",
+           "signal",
+           "disney",
+           "tatari",
+           "spectrum_reach",
+           "ampersand",
+           "iqiyi",
+           "jiohotstar",
+           "zee5",
+           "viu",
+           "tver",
+           "soop",
+           "audacy",
+           "libsyn",
+           "audioboom",
+           "redcircle",
+           "gumball",
+           "anghami",
+           "etsy",
+           "cvs",
+           "ulta",
+           "wayfair",
+           "chewy",
+           "sephora",
+           "grab",
+           "goto",
+           "myntra",
+           "meesho",
+           "nykaa",
+           "blinkit",
+           "zepto",
+           "swiggy",
+           "rakuten_rpp",
+           "mercari",
+           "coupang",
+           "zalando",
+           "cdiscount",
+           "tesco_media",
+           "noon",
+           "trendyol",
+           "rappi",
+           "ifood",
+           "paypal_ads",
+           "chase_media",
+           "samsung_galaxy_store",
+           "oppo_ads",
+           "vivo_ads",
+           "transsion_ads",
+           "aptoide",
+           "bigo_ads",
+           "verve",
+           "yeahmobi",
+           "adjoe",
+           "mistplay",
+           "anzu",
+           "frameplay",
+           "admix",
+           "steam",
+           "playstation",
+           "nintendo",
+           "epic_games",
+           "overwolf",
+           "venatus",
+           "microsoft_invest",
+           "illumin",
+           "cadent",
+           "sixsense",
+           "madison_logic",
+           "hawk",
+           "perion",
+           "admixer",
+           "dable",
+           "popin",
+           "logly",
+           "gunosy",
+           "plista",
+           "zergnet",
+           "lockerdome",
+           "engageya",
+           "flipboard",
+           "rollerads",
+           "pushground",
+           "megapush",
+           "bidvertiser",
+           "seven_search",
+           "infolinks",
+           "twinred",
+           "adxpansion",
+           "cointraffic",
+           "a_ads",
+           "hypelab",
+           "slise",
+           "coinmarketcap_ads",
+           "coingecko_ads",
+           "collabstr",
+           "beehiiv_ads",
+           "sponsy",
+           "kit_sponsor_network",
+           "g2",
+           "trustradius",
+           "codefund",
+           "daily_dev",
+           "dev_to",
+           "techtarget",
+           "clutch",
+           "angi",
+           "thumbtack",
+           "houzz",
+           "two_gis",
+           "kayak",
+           "expedia_group",
+           "trivago",
+           "skyscanner",
+           "hopper",
+           "trip_com",
+           "airbnb",
+           "gumtree",
+           "kijiji",
+           "leboncoin",
+           "stepstone",
+           "appcast",
+           "zillow",
+           "billups",
+           "hinge",
+           "mixi",
+           "taringa",
+           "plurk",
+           "mewe",
+           "wattpad",
+           "duolingo",
+           "trovo",
+           "letterboxd",
+           "chingari",
+           "ptt",
+           "flickr",
+           "fanfiction",
+           "koo",
+           "clubhouse",
+           "caffeine",
+           "hike",
+           "patreon",
+           "vimeo",
+           "triller",
+           "pacvue",
+           "quartile",
+           "magnite",
+           "pubmatic",
+           "openx",
+           "index_exchange",
+           "sharethrough",
+           "sovrn",
+           "gumgum",
+           "yieldmo",
+           "pulsepoint",
+           "webgains",
+           "involve_asia",
+           "skimlinks",
+           "triton_digital",
+           "cardlytics",
+           "ibotta_ipn",
+           "mirakl_ads",
+           "podcorn",
+           "seedtag",
+           "karrot_daangn",
+           "toss_ads",
+           "mts_ads",
+           "pinduoduo",
+           "carousell",
+           "paytm_ads",
+           "phonepe_ads",
+           "zomato_ads",
+           "ogury",
+           "cognitiv",
+           "system1",
+           "boomplay",
+           "sber_ads",
+           "qoo10",
+           "emag_ads",
+           "kaspi_ads",
+           "nectar360",
+           "vinted_ads",
+           "foursquare_ads",
+           "jooble",
+           "talent_com",
+           "zoominfo_ads",
+           "terminus",
+           "ltk",
+           "valuecommerce",
+           "idealo",
+           "pricerunner",
+           "skroutz",
+           "heureka",
+           "zbozi_cz",
+           "ceneo",
+           "kevel",
+           "sojern",
+           "thrad",
+           "zeroclick",
+           "koah",
+           "cartology",
+           "coles_360",
+           "kohls_media_network",
+           "ad_retail_media",
+           "hepsiburada_ads",
+           "daisycon",
+           "digistore24",
+           "innovid",
+           "mediaocean_prisma",
+           "appnext",
+           "sigmob",
+           "topon_tradplus",
+           "persona_ly",
+           "glance",
+           "mediavine",
+           "raptive",
+           "ezoic",
+           "adpushup",
+           "freestar",
+           "playwire",
+           "connatix",
+           "jcdecaux",
+           "clear_channel_outdoor",
+           "outfront_media",
+           "lamar_advertising",
+           "moving_walls",
+           "adomni",
+           "bombora",
+           "metadata_io",
+           "influ2",
+           "aspire",
+           "creatoriq",
+           "upfluence",
+           "spreaker",
+           "kinective_media",
+           "shahid_mms_works",
+           "nordstrom_media_network",
+           "dicks_media_network",
+           "zitcha",
+           "promoted_ai",
+           "makemytrip_ads",
+           "yemeksepeti_ads",
+           "glance_ads",
+           "jioads",
+           "cauly",
+           "adpopcorn",
+           "i_mobile",
+           "microad",
+           "logicad",
+           "freakout_red",
+           "ximalaya_ads",
+           "netease_cloud_music_ads",
+           "gaana_ads",
+           "radiko_ads",
+           "philo_ads",
+           "xumo_ads",
+           "rakuten_viki",
+           "delivery_hero",
+           "jumia",
+           "tripadvisor"
+          ]
          },
          "adAccountId": {
           "type": "string"
@@ -3955,25 +5433,25 @@ export const operations: Record<string, OperationMeta> = {
         "type": "object",
         "properties": {
          "hour": {
-          "description": "default 6",
+          "default": 6,
           "type": "integer",
           "minimum": 0,
           "maximum": 23
          },
          "minute": {
-          "description": "default 0",
+          "default": 0,
           "type": "integer",
           "minimum": 0,
           "maximum": 59
          },
          "weekday": {
-          "description": "0 = Sunday; weekly only; default 1",
+          "default": 1,
           "type": "integer",
           "minimum": 0,
           "maximum": 6
          },
          "timezone": {
-          "description": "IANA zone; default UTC",
+          "default": "UTC",
           "type": "string"
          }
         }
@@ -4016,8 +5494,7 @@ export const operations: Record<string, OperationMeta> = {
            ]
           },
           "value": {
-           "type": "number",
-           "description": "money metrics in the entity currency, major units"
+           "type": "number"
           },
           "windowDays": {
            "type": "integer",
@@ -4113,7 +5590,22 @@ export const operations: Record<string, OperationMeta> = {
         ]
        },
        "minSpendForEval": {
-        "$ref": "#/$defs/Money"
+        "type": "object",
+        "properties": {
+         "micros": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+         },
+         "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+         }
+        },
+        "required": [
+         "micros",
+         "currency"
+        ]
        }
       },
       "required": [
@@ -4122,8 +5614,7 @@ export const operations: Record<string, OperationMeta> = {
        "level",
        "conditions",
        "action"
-      ],
-      "description": "automation rule definition"
+      ]
      },
      "days": {
       "description": "default 30",
@@ -4195,25 +5686,25 @@ export const operations: Record<string, OperationMeta> = {
       "type": "object",
       "properties": {
        "hour": {
-        "description": "default 6",
+        "default": 6,
         "type": "integer",
         "minimum": 0,
         "maximum": 23
        },
        "minute": {
-        "description": "default 0",
+        "default": 0,
         "type": "integer",
         "minimum": 0,
         "maximum": 59
        },
        "weekday": {
-        "description": "0 = Sunday; weekly only; default 1",
+        "default": 1,
         "type": "integer",
         "minimum": 0,
         "maximum": 6
        },
        "timezone": {
-        "description": "IANA zone; default UTC",
+        "default": "UTC",
         "type": "string"
        }
       }
@@ -4511,7 +6002,6 @@ export const operations: Record<string, OperationMeta> = {
       ]
      },
      "retention": {
-      "description": "per dataset: a number sets the days kept, null clears it",
       "type": "object",
       "propertyNames": {
        "type": "string",
@@ -4691,7 +6181,6 @@ export const operations: Record<string, OperationMeta> = {
         ]
        },
        "event_id": {
-        "description": "dedupe key",
         "type": "string",
         "pattern": "^[\\w.:-]{1,128}$"
        },
@@ -4705,7 +6194,6 @@ export const operations: Record<string, OperationMeta> = {
         "maxLength": 128
        },
        "value": {
-        "description": "major units",
         "anyOf": [
          {
           "type": "number",
@@ -4721,7 +6209,6 @@ export const operations: Record<string, OperationMeta> = {
         "pattern": "^[A-Za-z]{3}$"
        },
        "adv_cid": {
-        "description": "Advernue ad id from the tagged landing URL",
         "type": "string",
         "pattern": "^[\\w.:-]{1,128}$"
        },
@@ -4808,7 +6295,6 @@ export const operations: Record<string, OperationMeta> = {
            ]
           },
           "event_id": {
-           "description": "dedupe key",
            "type": "string",
            "pattern": "^[\\w.:-]{1,128}$"
           },
@@ -4822,7 +6308,6 @@ export const operations: Record<string, OperationMeta> = {
            "maxLength": 128
           },
           "value": {
-           "description": "major units",
            "anyOf": [
             {
              "type": "number",
@@ -4838,7 +6323,6 @@ export const operations: Record<string, OperationMeta> = {
            "pattern": "^[A-Za-z]{3}$"
           },
           "adv_cid": {
-           "description": "Advernue ad id from the tagged landing URL",
            "type": "string",
            "pattern": "^[\\w.:-]{1,128}$"
           },
@@ -4968,7 +6452,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "kind": {
-      "description": "default public",
       "type": "string",
       "enum": [
        "public",
@@ -5098,32 +6581,25 @@ export const operations: Record<string, OperationMeta> = {
      },
      "webhookSecret": {
       "type": "string",
-      "minLength": 8,
-      "description": "Shopify client secret, Stripe whsec_, Woo secret"
+      "minLength": 8
      },
      "shopDomain": {
-      "description": "shopify, for backfill",
       "type": "string"
      },
      "accessToken": {
-      "description": "shopify, for backfill",
       "type": "string"
      },
      "apiKey": {
-      "description": "stripe restricted read key, for backfill",
       "type": "string"
      },
      "baseUrl": {
-      "description": "woocommerce store URL",
       "type": "string",
       "format": "uri"
      },
      "consumerKey": {
-      "description": "woocommerce",
       "type": "string"
      },
      "consumerSecret": {
-      "description": "woocommerce",
       "type": "string"
      }
     },
@@ -5538,7 +7014,6 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "platforms": {
-      "description": "default meta, google_ads, tiktok",
       "type": "array",
       "items": {
        "type": "string"
@@ -5607,7 +7082,6 @@ export const operations: Record<string, OperationMeta> = {
     "type": "object",
     "properties": {
      "platforms": {
-      "description": "default meta, google_ads, tiktok",
       "type": "array",
       "items": {
        "type": "string"
@@ -5743,8 +7217,7 @@ export const operations: Record<string, OperationMeta> = {
        "basis": {
         "type": "string",
         "minLength": 3,
-        "maxLength": 500,
-        "description": "where the consent comes from"
+        "maxLength": 500
        }
       },
       "required": [
@@ -5768,8 +7241,7 @@ export const operations: Record<string, OperationMeta> = {
          "maxLength": 40
         }
        }
-      },
-      "description": "raw contacts; hashed on receipt, never stored or returned in clear"
+      }
      },
      "defaultCountryCode": {
       "type": "string",
@@ -5825,8 +7297,7 @@ export const operations: Record<string, OperationMeta> = {
      "ratio": {
       "type": "number",
       "minimum": 0.01,
-      "maximum": 0.2,
-      "description": "0.01 is the closest 1%"
+      "maximum": 0.2
      }
     },
     "required": [
@@ -5919,8 +7390,7 @@ export const operations: Record<string, OperationMeta> = {
        "basis": {
         "type": "string",
         "minLength": 3,
-        "maxLength": 500,
-        "description": "where the consent comes from"
+        "maxLength": 500
        }
       },
       "required": [
@@ -5944,8 +7414,7 @@ export const operations: Record<string, OperationMeta> = {
          "maxLength": 40
         }
        }
-      },
-      "description": "raw contacts; hashed on receipt, never stored or returned in clear"
+      }
      },
      "defaultCountryCode": {
       "type": "string",
@@ -6001,8 +7470,7 @@ export const operations: Record<string, OperationMeta> = {
          "maxLength": 40
         }
        }
-      },
-      "description": "raw contacts; hashed on receipt, never stored or returned in clear"
+      }
      },
      "defaultCountryCode": {
       "type": "string",
@@ -6102,7 +7570,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "boolean"
      },
      "eventTypes": {
-      "description": "default purchase, lead",
       "minItems": 1,
       "type": "array",
       "items": {
@@ -6121,8 +7588,7 @@ export const operations: Record<string, OperationMeta> = {
       "propertyNames": {
        "type": "string"
       },
-      "additionalProperties": {},
-      "description": "destination ids only: pixelId, conversionActionId or pixelCode"
+      "additionalProperties": {}
      }
     },
     "required": [
@@ -6153,8 +7619,7 @@ export const operations: Record<string, OperationMeta> = {
      "eventId": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 200,
-      "description": "event_id or stored row id"
+      "maxLength": 200
      },
      "userData": {
       "type": "object",
@@ -6203,11 +7668,9 @@ export const operations: Record<string, OperationMeta> = {
         "type": "string",
         "maxLength": 300
        }
-      },
-      "description": "raw identifiers; hashed immediately, never stored or returned"
+      }
      },
      "consent": {
-      "description": "required when userData has contact details",
       "type": "boolean"
      },
      "sourceUrl": {
@@ -6526,6 +7989,9 @@ export const operations: Record<string, OperationMeta> = {
    "schema": {
     "type": "object",
     "properties": {
+     "clientId": {
+      "type": "string"
+     },
      "dimension": {
       "type": "string",
       "enum": [
@@ -6537,8 +8003,7 @@ export const operations: Record<string, OperationMeta> = {
        "age",
        "gender",
        "hour"
-      ],
-      "description": "geo_country (ISO-3166 alpha-2 or \"unknown\"), device (desktop|mobile|tablet|ctv|other), placement, creative, ad, age, gender, hour (00-23). Only platforms that report a dimension contribute rows."
+      ]
      },
      "from": {
       "type": "string",
@@ -6548,11 +8013,7 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
      },
-     "clientId": {
-      "type": "string"
-     },
      "byPlatform": {
-      "description": "Split each value by platform (default: merge).",
       "type": "boolean"
      },
      "platforms": {
@@ -7059,7 +8520,6 @@ export const operations: Record<string, OperationMeta> = {
       }
      },
      "currency": {
-      "description": "Reporting currency (ISO-4217).",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7100,7 +8560,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "currency": {
-      "description": "Reporting currency; default: the client one",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7149,7 +8608,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "currency": {
-      "description": "Reporting currency; default: the client one",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7172,11 +8630,13 @@ export const operations: Record<string, OperationMeta> = {
       ]
      },
      "horizonDays": {
+      "default": 14,
       "type": "integer",
       "minimum": 1,
       "maximum": 90
      },
      "historyDays": {
+      "default": 56,
       "type": "integer",
       "minimum": 14,
       "maximum": 365
@@ -7214,7 +8674,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "currency": {
-      "description": "Reporting currency; default: the client one",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7242,11 +8701,13 @@ export const operations: Record<string, OperationMeta> = {
       "maximum": 90
      },
      "maxLag": {
+      "default": 7,
       "type": "integer",
       "minimum": 0,
       "maximum": 7
      },
      "maxPlatforms": {
+      "default": 6,
       "type": "integer",
       "minimum": 2,
       "maximum": 10
@@ -7281,7 +8742,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "currency": {
-      "description": "Reporting currency; default: the client one",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7304,6 +8764,7 @@ export const operations: Record<string, OperationMeta> = {
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
      },
      "groupBy": {
+      "default": "platform",
       "type": "string",
       "enum": [
        "platform",
@@ -7340,7 +8801,6 @@ export const operations: Record<string, OperationMeta> = {
       "type": "string"
      },
      "currency": {
-      "description": "Reporting currency; default: the client one",
       "type": "string",
       "minLength": 3,
       "maxLength": 3
@@ -7371,7 +8831,9 @@ export const operations: Record<string, OperationMeta> = {
         "maximum": 9007199254740991
        },
        "currency": {
-        "type": "string"
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 3
        }
       },
       "required": [
@@ -7380,11 +8842,13 @@ export const operations: Record<string, OperationMeta> = {
       ]
      },
      "minFactor": {
+      "default": 0.5,
       "type": "number",
       "minimum": 0,
       "maximum": 1
      },
      "maxFactor": {
+      "default": 2,
       "type": "number",
       "minimum": 1,
       "maximum": 5
@@ -8780,7 +10244,8 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
   "required": [
    "type",
    "amount"
-  ]
+  ],
+  "additionalProperties": false
  },
  "Bid": {
   "type": "object",
@@ -10239,7 +11704,38 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
     ]
    },
    "totalBudget": {
-    "$ref": "#/$defs/Budget"
+    "type": "object",
+    "properties": {
+     "type": {
+      "type": "string",
+      "enum": [
+       "daily",
+       "lifetime"
+      ]
+     },
+     "amount": {
+      "type": "object",
+      "properties": {
+       "micros": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+       },
+       "currency": {
+        "type": "string",
+        "pattern": "^[A-Z]{3}$"
+       }
+      },
+      "required": [
+       "micros",
+       "currency"
+      ]
+     }
+    },
+    "required": [
+     "type",
+     "amount"
+    ]
    },
    "split": {
     "oneOf": [
@@ -10285,18 +11781,18 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
         "const": "performance"
        },
        "lookbackDays": {
-        "description": "default 30",
+        "default": 30,
         "type": "integer",
         "minimum": 1,
         "maximum": 365
        },
        "minConversions": {
-        "description": "default 10",
+        "default": 10,
         "type": "number",
         "minimum": 0
        },
        "minSpendMicros": {
-        "description": "default 0",
+        "default": 0,
         "type": "integer",
         "minimum": 0,
         "maximum": 9007199254740991
@@ -10306,16 +11802,17 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
        "type"
       ]
      }
-    ],
-    "description": "how totalBudget is divided across targets"
+    ]
    },
    "startAt": {
     "type": "string",
-    "description": "ISO-8601 with Z or an offset; normalised to UTC"
+    "format": "date-time",
+    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
    },
    "endAt": {
-    "description": "must be >= startAt",
-    "type": "string"
+    "type": "string",
+    "format": "date-time",
+    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
    },
    "targeting": {
     "type": "object",
@@ -10486,22 +11983,19 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
    },
    "destinationUrl": {
     "type": "string",
-    "format": "uri",
-    "description": "tagged with utm and adv_cid on launch"
+    "format": "uri"
    },
    "targets": {
     "minItems": 1,
     "type": "array",
     "items": {
      "type": "string"
-    },
-    "description": "ad account ids of one client, no duplicates"
+    }
    },
    "acceptUnknownSpec": {
     "type": "boolean"
    },
    "platformOverrides": {
-    "description": "platformNative-style extras per platform",
     "type": "object",
     "propertyNames": {
      "type": "string",
@@ -11021,7 +12515,44 @@ export const componentSchemas: Record<string, Record<string, unknown>> = {
        "additionalProperties": {}
       },
       "bid": {
-       "$ref": "#/$defs/Bid"
+       "type": "object",
+       "properties": {
+        "strategy": {
+         "type": "string",
+         "enum": [
+          "lowest_cost",
+          "cost_cap",
+          "bid_cap",
+          "target_roas",
+          "target_cpa",
+          "manual_cpc"
+         ]
+        },
+        "amount": {
+         "type": "object",
+         "properties": {
+          "micros": {
+           "type": "integer",
+           "minimum": -9007199254740991,
+           "maximum": 9007199254740991
+          },
+          "currency": {
+           "type": "string",
+           "pattern": "^[A-Z]{3}$"
+          }
+         },
+         "required": [
+          "micros",
+          "currency"
+         ]
+        },
+        "targetRoas": {
+         "type": "number"
+        }
+       },
+       "required": [
+        "strategy"
+       ]
       }
      }
     }
