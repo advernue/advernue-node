@@ -1459,6 +1459,18 @@ export type FxListResponse = Array<{
   rate: number;
 }>;
 
+export type OperatorLoadFxRatesBody = {
+  rates: Array<{
+    date: string;
+    base: string;
+    quote: string;
+    rate: number;
+  }>;
+};
+export type OperatorLoadFxRatesResponse = {
+  count: number;
+};
+
 export type ActionsListParams = {
   status?: string;
   parentId?: string;
@@ -1835,6 +1847,19 @@ export type ApiKeysRevokeParams = {
 };
 export type ApiKeysRevokeResponse = void;
 
+export type OpsHealthResponse = {
+  ok: true;
+};
+
+export type OpsReadyResponse = {
+  ok: boolean;
+  checks: Record<string, {
+    ok: boolean;
+    ms: number;
+    detail?: string;
+  }>;
+};
+
 export type ApprovalLinksPreviewParams = {
   token: string;
 };
@@ -1860,6 +1885,32 @@ export type ApprovalLinksSlackInteractionResponse = {
   text: string;
 };
 
+export type PlatformPlatformConfigResponse = {
+  /** Whether Atlas sign-in may create a workspace for a person with no invite. */
+  signup: boolean;
+  atlas: {
+    issuer: string;
+    clientId: string;
+  } | null;
+  cookiemunch: {
+    cbid: string;
+  } | null;
+  chatly: {
+    publicId: string;
+  } | null;
+  referalli: {
+    publicKey: string;
+    programId: string;
+  } | null;
+  seolyticize: {
+    siteId: string;
+    siteKey: string;
+  } | null;
+  forumulate: {
+    base: string;
+  } | null;
+};
+
 export type WorkspacesCreateBody = {
   name: string;
 };
@@ -1874,47 +1925,6 @@ export type WorkspacesCreateResponse = {
   apiKey: string;
 };
 
-export type AuthRegisterBody = {
-  email: string;
-  password: string;
-  name: string;
-  workspaceName: string;
-};
-export type AuthRegisterResponse = {
-  /** Send as X-CSRF-Token on cookie-authenticated writes. */
-  csrfToken: string;
-  /** ISO-8601 timestamp */
-  expiresAt: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    /** ISO-8601 timestamp */
-    createdAt: string;
-  };
-  workspaceId: string;
-};
-
-export type AuthLoginBody = {
-  email: string;
-  password: string;
-  workspaceId?: string;
-};
-export type AuthLoginResponse = {
-  /** Send as X-CSRF-Token on cookie-authenticated writes. */
-  csrfToken: string;
-  /** ISO-8601 timestamp */
-  expiresAt: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    /** ISO-8601 timestamp */
-    createdAt: string;
-  };
-  workspaceId: string;
-};
-
 export type InvitesPreviewParams = {
   token: string;
 };
@@ -1922,28 +1932,8 @@ export type InvitesPreviewResponse = {
   email: string;
   role: "owner" | "admin" | "manager" | "viewer";
   workspaceName: string;
-  /** True: sign in as that account, then accept (no password is taken). */
+  /** True: the invitee already has an account and signs in with it through Atlas. */
   existingAccount: boolean;
-};
-
-export type InvitesAcceptBody = {
-  token: string;
-  password: string;
-  name?: string;
-};
-export type InvitesAcceptResponse = {
-  /** Send as X-CSRF-Token on cookie-authenticated writes. */
-  csrfToken: string;
-  /** ISO-8601 timestamp */
-  expiresAt: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    /** ISO-8601 timestamp */
-    createdAt: string;
-  };
-  workspaceId: string;
 };
 
 export type PublicReportsGetParams = {
@@ -2534,6 +2524,17 @@ export type BillingCheckoutResponse = {
 
 export type BillingPortalResponse = {
   url: string;
+};
+
+export type BillingReferralResponse = {
+  /** False until Referalli is configured on this server. */
+  enabled: boolean;
+  enrolled: boolean;
+  link: string | null;
+  code: string | null;
+  clicks: number;
+  referrals: number;
+  convertedCustomers: number;
 };
 
 export type TrackingIngestParams = {

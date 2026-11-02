@@ -99,6 +99,8 @@ import type {
   ApprovalsCommentResponse,
   FxListParams,
   FxListResponse,
+  OperatorLoadFxRatesBody,
+  OperatorLoadFxRatesResponse,
   ActionsListParams,
   ActionsListResponse,
   ActionsGetParams,
@@ -146,22 +148,19 @@ import type {
   ApiKeysCreateResponse,
   ApiKeysRevokeParams,
   ApiKeysRevokeResponse,
+  OpsHealthResponse,
+  OpsReadyResponse,
   ApprovalLinksPreviewParams,
   ApprovalLinksPreviewResponse,
   ApprovalLinksDecideParams,
   ApprovalLinksDecideResponse,
   ApprovalLinksSlackInteractionParams,
   ApprovalLinksSlackInteractionResponse,
+  PlatformPlatformConfigResponse,
   WorkspacesCreateBody,
   WorkspacesCreateResponse,
-  AuthRegisterBody,
-  AuthRegisterResponse,
-  AuthLoginBody,
-  AuthLoginResponse,
   InvitesPreviewParams,
   InvitesPreviewResponse,
-  InvitesAcceptBody,
-  InvitesAcceptResponse,
   PublicReportsGetParams,
   PublicReportsGetResponse,
   PublicReportsHtmlParams,
@@ -256,6 +255,7 @@ import type {
   BillingCheckoutBody,
   BillingCheckoutResponse,
   BillingPortalResponse,
+  BillingReferralResponse,
   TrackingIngestParams,
   TrackingIngestBody,
   TrackingIngestResponse,
@@ -456,12 +456,6 @@ export function buildNamespaces(call: Call) {
       /** POST /v1/auth/switch-workspace: Switch workspace */
       switchWorkspace: (body: AuthSwitchWorkspaceBody, opts?: WriteOptions): Promise<AuthSwitchWorkspaceResponse> =>
         call(op("auth.switchWorkspace"), undefined, body, opts) as Promise<AuthSwitchWorkspaceResponse>,
-      /** POST /v1/auth/register: Create a user and workspace (gated) */
-      register: (body: AuthRegisterBody, opts?: RequestOptions): Promise<AuthRegisterResponse> =>
-        call(op("auth.register"), undefined, body, opts) as Promise<AuthRegisterResponse>,
-      /** POST /v1/auth/login: Sign in; sets the adv_session cookie */
-      login: (body: AuthLoginBody, opts?: RequestOptions): Promise<AuthLoginResponse> =>
-        call(op("auth.login"), undefined, body, opts) as Promise<AuthLoginResponse>,
     },
     members: {
       /** GET /v1/members/audit: Role and access changes, newest first */
@@ -490,9 +484,6 @@ export function buildNamespaces(call: Call) {
       /** GET /v1/auth/invites/{token}: Preview an invite link */
       preview: (params: InvitesPreviewParams, opts?: RequestOptions): Promise<InvitesPreviewResponse> =>
         call(op("invites.preview"), params, undefined, opts) as Promise<InvitesPreviewResponse>,
-      /** POST /v1/auth/invites/accept: Accept an invite (session) */
-      accept: (body: InvitesAcceptBody, opts?: RequestOptions): Promise<InvitesAcceptResponse> =>
-        call(op("invites.accept"), undefined, body, opts) as Promise<InvitesAcceptResponse>,
     },
     savedViews: {
       /** GET /v1/saved-views: List saved dashboard filters */
@@ -567,6 +558,11 @@ export function buildNamespaces(call: Call) {
       /** GET /v1/fx-rates: FX rates used by cap math (global data) */
       list: (params?: FxListParams, opts?: RequestOptions): Promise<FxListResponse> =>
         call(op("fx.list"), params, undefined, opts) as Promise<FxListResponse>,
+    },
+    operator: {
+      /** PUT /v1/fx-rates: Load FX rates (X-Operator-Token) */
+      loadFxRates: (body: OperatorLoadFxRatesBody, opts?: RequestOptions): Promise<OperatorLoadFxRatesResponse> =>
+        call(op("operator.loadFxRates"), undefined, body, opts) as Promise<OperatorLoadFxRatesResponse>,
     },
     actions: {
       /** GET /v1/actions: List actions (status is comma-separated) */
@@ -659,6 +655,14 @@ export function buildNamespaces(call: Call) {
       revoke: (params: ApiKeysRevokeParams, opts?: WriteOptions): Promise<ApiKeysRevokeResponse> =>
         call(op("apiKeys.revoke"), params, undefined, opts) as Promise<ApiKeysRevokeResponse>,
     },
+    ops: {
+      /** GET /health: Liveness probe */
+      health: (opts?: RequestOptions): Promise<OpsHealthResponse> =>
+        call(op("ops.health"), undefined, undefined, opts) as Promise<OpsHealthResponse>,
+      /** GET /ready: Readiness (database, queue); 503 when failing */
+      ready: (opts?: RequestOptions): Promise<OpsReadyResponse> =>
+        call(op("ops.ready"), undefined, undefined, opts) as Promise<OpsReadyResponse>,
+    },
     approvalLinks: {
       /** GET /v1/approval-links/{token}: Preview (HTML page) */
       preview: (params: ApprovalLinksPreviewParams, opts?: RequestOptions): Promise<ApprovalLinksPreviewResponse> =>
@@ -669,6 +673,11 @@ export function buildNamespaces(call: Call) {
       /** POST /v1/integrations/slack/{workspaceId}/{channelId}/interactions: Slack interactivity callback (signed) */
       slackInteraction: (params: ApprovalLinksSlackInteractionParams, opts?: RequestOptions): Promise<ApprovalLinksSlackInteractionResponse> =>
         call(op("approvalLinks.slackInteraction"), params, undefined, opts) as Promise<ApprovalLinksSlackInteractionResponse>,
+    },
+    platform: {
+      /** GET /v1/platform-config: Public ids of the integrated platforms */
+      platformConfig: (opts?: RequestOptions): Promise<PlatformPlatformConfigResponse> =>
+        call(op("platform.platformConfig"), undefined, undefined, opts) as Promise<PlatformPlatformConfigResponse>,
     },
     workspaces: {
       /** POST /v1/workspaces: Bootstrap a workspace and owner key */
@@ -837,6 +846,9 @@ export function buildNamespaces(call: Call) {
       /** POST /v1/billing/portal: Open the Stripe customer portal; returns the hosted URL */
       portal: (opts?: WriteOptions): Promise<BillingPortalResponse> =>
         call(op("billing.portal"), undefined, undefined, opts) as Promise<BillingPortalResponse>,
+      /** GET /v1/referral: Refer and earn: the signed-in admin partner link and stats from Referalli (admin) */
+      referral: (opts?: RequestOptions): Promise<BillingReferralResponse> =>
+        call(op("billing.referral"), undefined, undefined, opts) as Promise<BillingReferralResponse>,
     },
     tracking: {
       /** POST /v1/events: Ingest events (202). Auth: X-Advernue-Key header, or ?key= for public keys */

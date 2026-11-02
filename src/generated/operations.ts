@@ -1567,6 +1567,63 @@ export const operations: Record<string, OperationMeta> = {
   "auth": true,
   "response": "json"
  },
+ "operator.loadFxRates": {
+  "id": "operator.loadFxRates",
+  "tag": "operator",
+  "name": "loadFxRates",
+  "method": "PUT",
+  "path": "/v1/fx-rates",
+  "summary": "Load FX rates (X-Operator-Token)",
+  "pathParams": [],
+  "query": [],
+  "body": {
+   "required": true,
+   "schema": {
+    "type": "object",
+    "properties": {
+     "rates": {
+      "minItems": 1,
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "date": {
+         "type": "string",
+         "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "base": {
+         "type": "string",
+         "pattern": "^[A-Z]{3}$"
+        },
+        "quote": {
+         "type": "string",
+         "pattern": "^[A-Z]{3}$"
+        },
+        "rate": {
+         "type": "number",
+         "exclusiveMinimum": 0
+        }
+       },
+       "required": [
+        "date",
+        "base",
+        "quote",
+        "rate"
+       ]
+      }
+     }
+    },
+    "required": [
+     "rates"
+    ]
+   }
+  },
+  "idempotent": false,
+  "dryRun": false,
+  "auth": false,
+  "response": "json"
+ },
  "actions.list": {
   "id": "actions.list",
   "tag": "actions",
@@ -2309,6 +2366,34 @@ export const operations: Record<string, OperationMeta> = {
   "auth": true,
   "response": "none"
  },
+ "ops.health": {
+  "id": "ops.health",
+  "tag": "ops",
+  "name": "health",
+  "method": "GET",
+  "path": "/health",
+  "summary": "Liveness probe",
+  "pathParams": [],
+  "query": [],
+  "idempotent": false,
+  "dryRun": false,
+  "auth": false,
+  "response": "json"
+ },
+ "ops.ready": {
+  "id": "ops.ready",
+  "tag": "ops",
+  "name": "ready",
+  "method": "GET",
+  "path": "/ready",
+  "summary": "Readiness (database, queue); 503 when failing",
+  "pathParams": [],
+  "query": [],
+  "idempotent": false,
+  "dryRun": false,
+  "auth": false,
+  "response": "json"
+ },
  "approvalLinks.preview": {
   "id": "approvalLinks.preview",
   "tag": "approvalLinks",
@@ -2382,6 +2467,20 @@ export const operations: Record<string, OperationMeta> = {
   "auth": false,
   "response": "json"
  },
+ "platform.platformConfig": {
+  "id": "platform.platformConfig",
+  "tag": "platform",
+  "name": "platformConfig",
+  "method": "GET",
+  "path": "/v1/platform-config",
+  "summary": "Public ids of the integrated platforms",
+  "pathParams": [],
+  "query": [],
+  "idempotent": false,
+  "dryRun": false,
+  "auth": false,
+  "response": "json"
+ },
  "workspaces.create": {
   "id": "workspaces.create",
   "tag": "workspaces",
@@ -2411,89 +2510,6 @@ export const operations: Record<string, OperationMeta> = {
   "auth": false,
   "response": "json"
  },
- "auth.register": {
-  "id": "auth.register",
-  "tag": "auth",
-  "name": "register",
-  "method": "POST",
-  "path": "/v1/auth/register",
-  "summary": "Create a user and workspace (gated)",
-  "pathParams": [],
-  "query": [],
-  "body": {
-   "required": true,
-   "schema": {
-    "type": "object",
-    "properties": {
-     "email": {
-      "type": "string"
-     },
-     "password": {
-      "type": "string",
-      "minLength": 10,
-      "maxLength": 200
-     },
-     "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 100
-     },
-     "workspaceName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 100
-     }
-    },
-    "required": [
-     "email",
-     "password",
-     "name",
-     "workspaceName"
-    ]
-   }
-  },
-  "idempotent": false,
-  "dryRun": false,
-  "auth": false,
-  "response": "json"
- },
- "auth.login": {
-  "id": "auth.login",
-  "tag": "auth",
-  "name": "login",
-  "method": "POST",
-  "path": "/v1/auth/login",
-  "summary": "Sign in; sets the adv_session cookie",
-  "pathParams": [],
-  "query": [],
-  "body": {
-   "required": true,
-   "schema": {
-    "type": "object",
-    "properties": {
-     "email": {
-      "type": "string"
-     },
-     "password": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 200
-     },
-     "workspaceId": {
-      "type": "string"
-     }
-    },
-    "required": [
-     "email",
-     "password"
-    ]
-   }
-  },
-  "idempotent": false,
-  "dryRun": false,
-  "auth": false,
-  "response": "json"
- },
  "invites.preview": {
   "id": "invites.preview",
   "tag": "invites",
@@ -2511,46 +2527,6 @@ export const operations: Record<string, OperationMeta> = {
    }
   ],
   "query": [],
-  "idempotent": false,
-  "dryRun": false,
-  "auth": false,
-  "response": "json"
- },
- "invites.accept": {
-  "id": "invites.accept",
-  "tag": "invites",
-  "name": "accept",
-  "method": "POST",
-  "path": "/v1/auth/invites/accept",
-  "summary": "Accept an invite (session)",
-  "pathParams": [],
-  "query": [],
-  "body": {
-   "required": true,
-   "schema": {
-    "type": "object",
-    "properties": {
-     "token": {
-      "type": "string",
-      "minLength": 1
-     },
-     "password": {
-      "type": "string",
-      "minLength": 10,
-      "maxLength": 200
-     },
-     "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 100
-     }
-    },
-    "required": [
-     "token",
-     "password"
-    ]
-   }
-  },
   "idempotent": false,
   "dryRun": false,
   "auth": false,
@@ -6142,6 +6118,20 @@ export const operations: Record<string, OperationMeta> = {
   "pathParams": [],
   "query": [],
   "idempotent": true,
+  "dryRun": false,
+  "auth": true,
+  "response": "json"
+ },
+ "billing.referral": {
+  "id": "billing.referral",
+  "tag": "billing",
+  "name": "referral",
+  "method": "GET",
+  "path": "/v1/referral",
+  "summary": "Refer and earn: the signed-in admin partner link and stats from Referalli (admin)",
+  "pathParams": [],
+  "query": [],
+  "idempotent": false,
   "dryRun": false,
   "auth": true,
   "response": "json"
