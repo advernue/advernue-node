@@ -7,18 +7,44 @@
   "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "files": ["dist", "spec/openapi.json", "README.md", "LICENSE"],
-  "engines": { "node": ">=22" },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "spec/openapi.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "generate": "node scripts/generate.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --pool=forks --poolOptions.forks.singleFork",
     "build": "tsc -p tsconfig.build.json",
-    "prepack": "pnpm run build"
+    "prepack": "pnpm run build",
+    "prepare": "tsc -p tsconfig.build.json"
   },
-  "repository": { "type": "git", "url": "git+https://github.com/advernue/advernue-node.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/advernue/advernue-node.git"
+  },
   "homepage": "https://github.com/advernue/advernue-node#readme",
-  "keywords": ["advernue", "ads", "advertising", "sdk", "api-client"],
-  "devDependencies": { "@types/node": "^22.10.0", "typescript": "^5.7.0", "vitest": "^3.0.0" }
+  "keywords": [
+    "advernue",
+    "ads",
+    "advertising",
+    "sdk",
+    "api-client"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
 }
